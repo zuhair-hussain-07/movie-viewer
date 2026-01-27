@@ -1,0 +1,35 @@
+package com.it2161.s243168t.movieviewer.ui.navigation
+
+import androidx.compose.runtime.Composable
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.it2161.s243168t.movieviewer.ui.screens.FavoritesScreen
+import com.it2161.s243168t.movieviewer.ui.screens.LoginScreen
+import com.it2161.s243168t.movieviewer.ui.screens.MovieDetailScreen
+import com.it2161.s243168t.movieviewer.ui.screens.MovieListScreen
+import com.it2161.s243168t.movieviewer.ui.screens.ProfileScreen
+import com.it2161.s243168t.movieviewer.ui.screens.RegisterScreen
+import com.it2161.s243168t.movieviewer.ui.screens.SearchScreen
+
+@Composable
+fun NavGraph(startDestination: String = Routes.Login.route) {
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = startDestination) {
+        composable(Routes.Login.route) { LoginScreen(navController = navController) }
+        composable(Routes.Register.route) { RegisterScreen(navController = navController) }
+        composable(Routes.Profile.route) { ProfileScreen(navController = navController) }
+        composable(Routes.MovieList.route) { MovieListScreen(navController = navController) }
+        composable(Routes.MovieDetail.route) { backStackEntry ->
+            val movieId = backStackEntry.arguments?.getString("movieId")?.toIntOrNull()
+            if (movieId != null) {
+                MovieDetailScreen(navController = navController, movieId = movieId)
+            } else {
+                // Handle error
+            }
+        }
+        composable(Routes.Favorites.route) { FavoritesScreen(navController = navController) }
+        composable(Routes.Search.route) { SearchScreen(navController = navController) }
+    }
+}

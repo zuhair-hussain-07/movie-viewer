@@ -21,8 +21,9 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context.applicationContext,
             AppDatabase::class.java,
-            "movie_viewer_db"
-        ).build()
+            "movie_db"
+        ).fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides

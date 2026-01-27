@@ -5,16 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 
 @Composable
-fun LoginScreen(navController: NavController) {
-    Text("Login Screen")
-}
-
-@Composable
-fun RegisterScreen(navController: NavController) {
-    Text("Register Screen")
-}
-
-@Composable
 fun ProfileScreen(navController: NavController) {
     Text("Profile Screen")
 }

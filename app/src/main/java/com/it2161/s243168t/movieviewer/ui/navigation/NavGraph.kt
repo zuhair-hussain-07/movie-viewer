@@ -9,16 +9,18 @@ import com.it2161.s243168t.movieviewer.ui.screens.LoginScreen
 import com.it2161.s243168t.movieviewer.ui.screens.MovieDetailScreen
 import com.it2161.s243168t.movieviewer.ui.screens.MovieListScreen
 import com.it2161.s243168t.movieviewer.ui.screens.ProfileScreen
-import com.it2161.s243168t.movieviewer.ui.screens.RegisterScreen
+import com.it2161.s243168t.movieviewer.ui.screens.RegistrationScreen
 import com.it2161.s243168t.movieviewer.ui.screens.SearchScreen
 
 @Composable
-fun NavGraph(startDestination: String = Routes.Login.route) {
+fun NavGraph(startDestination: String = Routes.Register.route) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = startDestination) {
         composable(Routes.Login.route) { LoginScreen(navController = navController) }
-        composable(Routes.Register.route) { RegisterScreen(navController = navController) }
+        composable(Routes.Register.route) {
+            RegistrationScreen(navController = navController)
+        }
         composable(Routes.Profile.route) { ProfileScreen(navController = navController) }
         composable(Routes.MovieList.route) { MovieListScreen(navController = navController) }
         composable(Routes.MovieDetail.route) { backStackEntry ->

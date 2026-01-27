@@ -7,13 +7,22 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import com.it2161.s243168t.movieviewer.data.SessionManager
 import com.it2161.s243168t.movieviewer.ui.navigation.NavGraph
+import com.it2161.s243168t.movieviewer.ui.navigation.Routes
 import com.it2161.s243168t.movieviewer.ui.theme._243168TMovieViewerTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var sessionManager: SessionManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -23,7 +32,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    NavGraph()
+                    val userId by sessionManager.userId.collectAsState(initial = null)
+                    val startDestination = if (userId != null) Routes.MovieList.route else Routes.Login.route
+                    NavGraph(startDestination = startDestination)
                 }
             }
         }

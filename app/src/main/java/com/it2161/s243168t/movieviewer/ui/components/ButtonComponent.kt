@@ -22,7 +22,7 @@ fun ButtonComponent(
 ) {
     val buttonModifier = modifier
         .fillMaxWidth()
-        .padding(vertical = 8.dp)
+        .padding(vertical = 4.dp)
 
     val shape = RoundedCornerShape(8.dp)
 

@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val userId by sessionManager.userId.collectAsState(initial = null)
-                    val startDestination = if (userId != null) Routes.MovieList.route else Routes.Login.route
+                    val startDestination = if (userId != null) Routes.Profile.route else Routes.Login.route
                     NavGraph(startDestination = startDestination)
                 }
             }

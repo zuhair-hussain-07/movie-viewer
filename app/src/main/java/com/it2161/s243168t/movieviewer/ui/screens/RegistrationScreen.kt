@@ -84,8 +84,8 @@ fun RegistrationScreen(
         Column(
             modifier = Modifier
                 .padding(it)
+                .padding(16.dp)
                 .fillMaxSize()
-                .padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center

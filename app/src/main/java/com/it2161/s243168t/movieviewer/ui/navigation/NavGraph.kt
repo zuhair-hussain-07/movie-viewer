@@ -1,6 +1,7 @@
 package com.it2161.s243168t.movieviewer.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -13,10 +14,17 @@ import com.it2161.s243168t.movieviewer.ui.screens.RegistrationScreen
 import com.it2161.s243168t.movieviewer.ui.screens.SearchScreen
 
 @Composable
-fun NavGraph(startDestination: String = Routes.Register.route) {
+fun NavGraph(
+    modifier: Modifier = Modifier,
+    startDestination: String = Routes.Register.route
+) {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = startDestination) {
+    NavHost(
+        navController = navController,
+        startDestination = startDestination,
+        modifier = modifier
+    ) {
         composable(Routes.Login.route) { LoginScreen(navController = navController) }
         composable(Routes.Register.route) {
             RegistrationScreen(navController = navController)

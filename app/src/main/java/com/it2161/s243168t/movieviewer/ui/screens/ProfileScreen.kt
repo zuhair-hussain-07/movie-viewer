@@ -98,8 +98,8 @@ fun ProfileScreen(
         Column(
             modifier = Modifier
                 .padding(it)
-                .padding(16.dp)
                 .fillMaxSize()
+                .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -165,9 +165,9 @@ fun ProfileScreen(
                         ProfilePictureComponent(uri = user.profilePicture, isEditing = false)
                         Spacer(modifier = Modifier.height(8.dp))
                         CardComponent {
-                            ProfileDetailRow(label = "User ID", value = user.userId, icon = Icons.Default.Person)
+                            ProfileDetailRow(label = "User ID", value = user.userId)
                             ProfileDetailRow(label = "Preferred Name", value = user.preferredName)
-                            ProfileDetailRow(label = "Date of Birth", value = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(user.dateOfBirth), icon = Icons.Default.DateRange)
+                            ProfileDetailRow(label = "Date of Birth", value = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(user.dateOfBirth))
                         }
                         Spacer(modifier = Modifier.height(16.dp))
                         ButtonComponent(

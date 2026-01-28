@@ -16,7 +16,8 @@ import com.it2161.s243168t.movieviewer.ui.screens.SearchScreen
 @Composable
 fun NavGraph(
     modifier: Modifier = Modifier,
-    startDestination: String = Routes.Register.route
+    startDestination: String = Routes.Register.route,
+    isNetworkConnected: Boolean
 ) {
     val navController = rememberNavController()
 

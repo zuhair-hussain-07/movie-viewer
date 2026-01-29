@@ -1,9 +1,12 @@
 package com.it2161.s243168t.movieviewer.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -18,7 +21,8 @@ fun ButtonComponent(
     onClick: () -> Unit,
     type: ButtonType,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    isSelected: Boolean = false
 ) {
     val buttonModifier = modifier
         .fillMaxWidth()
@@ -53,6 +57,20 @@ fun ButtonComponent(
                 modifier = buttonModifier,
                 enabled = enabled,
                 shape = shape
+            ) {
+                Text(text)
+            }
+        }
+        ButtonType.SELECTABLE_BUTTON -> {
+            Button(
+                onClick = onClick,
+                modifier = buttonModifier,
+                enabled = enabled,
+                shape = shape,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                )
             ) {
                 Text(text)
             }

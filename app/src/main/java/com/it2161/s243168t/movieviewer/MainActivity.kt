@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
             _243168TMovieViewerTheme {
                 val userId by sessionManager.userId.collectAsState(initial = null)
                 val isConnected by networkObserver.isConnected.collectAsState(initial = true)
-                val startDestination = if (userId != null) Routes.Profile.route else Routes.Login.route
+                val startDestination = if (userId != null) Routes.MovieList.route else Routes.Login.route
 
                 NavGraph(
                     startDestination = startDestination,

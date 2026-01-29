@@ -3,6 +3,8 @@ package com.it2161.s243168t.movieviewer.di
 import android.content.Context
 import androidx.room.Room
 import com.it2161.s243168t.movieviewer.data.local.AppDatabase
+import com.it2161.s243168t.movieviewer.data.local.daos.MovieDao
+import com.it2161.s243168t.movieviewer.data.local.daos.ReviewDao
 import com.it2161.s243168t.movieviewer.data.local.daos.UserDao
 import dagger.Module
 import dagger.Provides
@@ -30,5 +32,17 @@ object DatabaseModule {
     @Singleton
     fun provideUserDao(appDatabase: AppDatabase): UserDao {
         return appDatabase.userDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideMovieDao(appDatabase: AppDatabase): MovieDao {
+        return appDatabase.movieDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideReviewDao(appDatabase: AppDatabase): ReviewDao {
+        return appDatabase.reviewDao()
     }
 }

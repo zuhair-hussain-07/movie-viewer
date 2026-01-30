@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -40,7 +41,7 @@ fun MovieCard(
             .fillMaxWidth()
             .clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
-        elevation = androidx.compose.material3.CardDefaults.cardElevation(
+        elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         )
     ) {
@@ -96,25 +97,6 @@ fun MovieCard(
                             color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
-                }
-
-                // Duration Badge (Bottom Left)
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(12.dp)
-                        .background(
-                            color = Color.Black.copy(alpha = 0.7f),
-                            shape = RoundedCornerShape(6.dp)
-                        )
-                        .padding(6.dp)
-                ) {
-                    Text(
-                        text = "${movie.runtime} min",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
                 }
             }
 

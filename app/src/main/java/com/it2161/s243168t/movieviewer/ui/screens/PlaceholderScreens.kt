@@ -13,8 +13,3 @@ fun MovieDetailScreen(navController: NavController, movieId: Int) {
 fun FavoritesScreen(navController: NavController) {
     Text("Favorites Screen")
 }
-
-@Composable
-fun SearchScreen(navController: NavController) {
-    Text("Search Screen")
-}

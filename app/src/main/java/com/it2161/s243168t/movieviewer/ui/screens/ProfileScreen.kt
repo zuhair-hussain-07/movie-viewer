@@ -20,6 +20,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
@@ -41,6 +42,7 @@ import com.it2161.s243168t.movieviewer.ui.components.CardComponent
 import com.it2161.s243168t.movieviewer.ui.components.ConfirmationDialog
 import com.it2161.s243168t.movieviewer.ui.components.FormFieldComponent
 import com.it2161.s243168t.movieviewer.ui.components.MovieAppTopAppBar
+import com.it2161.s243168t.movieviewer.ui.components.MovieBottomAppBar
 import com.it2161.s243168t.movieviewer.ui.components.ProfileDetailRow
 import com.it2161.s243168t.movieviewer.ui.components.ProfilePictureComponent
 import com.it2161.s243168t.movieviewer.ui.navigation.Routes
@@ -56,6 +58,7 @@ import java.util.Locale
 @Composable
 fun ProfileScreen(
     navController: NavController,
+    currentRoute: String = Routes.Profile.route,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -93,6 +96,19 @@ fun ProfileScreen(
                 }
             }
         },
+        bottomBar = {
+            MovieBottomAppBar(
+                currentRoute = currentRoute,
+                onNavigate = { route ->
+                    // Handle bottom navigation
+                    when (route) {
+                        Routes.MovieList.route -> navController.navigate(Routes.MovieList.route)
+                        Routes.Favorites.route -> navController.navigate(Routes.Favorites.route)
+                        Routes.Profile.route -> {}
+                    }
+                }
+            )
+        },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) {
         Column(
@@ -101,10 +117,43 @@ fun ProfileScreen(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             if (uiState.isLoading) {
                 CircularProgressIndicator()
+            } else if (uiState.user == null) {
+                // Handle null user case - show error and redirect
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = "Unable to load profile",
+                        style = androidx.compose.material3.MaterialTheme.typography.headlineSmall,
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.error
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Please log in again to access your profile",
+                        style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
+                        color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    ButtonComponent(
+                        text = "Back to Home",
+                        onClick = { navController.navigate(Routes.MovieList.route) },
+                        type = ButtonType.PRIMARY_BUTTON
+                    )
+                    ButtonComponent(
+                        text = "Sign Out",
+                        onClick = { navController.navigate(Routes.Login.route) { popUpTo(Routes.MovieList.route) { inclusive = true } } },
+                        type = ButtonType.SECONDARY_BUTTON
+                    )
+                }
             } else {
                 uiState.user?.let { user ->
                     if (uiState.isEditMode) {

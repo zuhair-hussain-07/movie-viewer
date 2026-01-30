@@ -32,6 +32,7 @@ class ProfileViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
             val userId = sessionManager.userId.first()
             if (userId != null) {
                 userRepository.getUserByIdFlow(userId.toInt()).collect { user ->
@@ -41,10 +42,13 @@ class ProfileViewModel @Inject constructor(
                             userId = user?.userId ?: "",
                             preferredName = user?.preferredName ?: "",
                             dob = user?.dateOfBirth?.let { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it) } ?: "",
-                            profilePicPath = user?.profilePicture
+                            profilePicPath = user?.profilePicture,
+                            isLoading = false
                         )
                     }
                 }
+            } else {
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }

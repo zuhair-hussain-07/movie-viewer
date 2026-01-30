@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.it2161.s243168t.movieviewer.ui.navigation.Routes
 
 data class BottomNavItem(
     val label: String,
@@ -45,19 +46,19 @@ fun MovieBottomAppBar(
             label = "Favorites",
             icon = Icons.Outlined.FavoriteBorder,
             selectedIcon = Icons.Filled.Favorite,
-            route = "favorites"
+            route = Routes.Favorites.route
         ),
         BottomNavItem(
             label = "Home",
             icon = Icons.Outlined.Home,
             selectedIcon = Icons.Filled.Home,
-            route = "home"
+            route = Routes.MovieList.route
         ),
         BottomNavItem(
             label = "Profile",
             icon = Icons.Outlined.Person,
             selectedIcon = Icons.Filled.Person,
-            route = "profile"
+            route = Routes.Profile.route
         )
     )
 

@@ -44,7 +44,7 @@ import com.it2161.s243168t.movieviewer.ui.viewmodels.movielist.MovieViewModel
 @Composable
 fun MovieListScreen(
     navController: NavController,
-    currentRoute: String = "home",
+    currentRoute: String = Routes.MovieList.route,
     viewModel: MovieViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -64,8 +64,8 @@ fun MovieListScreen(
         }
     }
 
-    val categories = listOf("Popular", "Top Rated", "Now Playing")
-    val categoryRoutes = listOf("popular", "top_rated", "now_playing")
+    val categories = listOf("Popular", "Top Rated", "Now Playing", "Upcoming")
+    val categoryRoutes = listOf("popular", "top_rated", "now_playing", "upcoming")
 
     Scaffold(
         topBar = {
@@ -88,9 +88,9 @@ fun MovieListScreen(
                 onNavigate = { route ->
                     // Handle bottom navigation
                     when (route) {
-                        "home" -> {}
-                        "favorites" -> navController.navigate(Routes.Favorites.route)
-                        "profile" -> navController.navigate(Routes.Profile.route)
+                        Routes.MovieList.route -> {}
+                        Routes.Favorites.route -> navController.navigate(Routes.Favorites.route)
+                        Routes.Profile.route -> navController.navigate(Routes.Profile.route)
                     }
                 }
             )
@@ -110,14 +110,14 @@ fun MovieListScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .padding(horizontal = 16.dp, vertical = 4.dp)
             )
 
             // Category Selection (LazyRow)
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(categories.size) { index ->

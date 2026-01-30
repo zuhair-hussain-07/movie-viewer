@@ -11,8 +11,6 @@ import com.it2161.s243168t.movieviewer.ui.screens.MovieDetailScreen
 import com.it2161.s243168t.movieviewer.ui.screens.MovieListScreen
 import com.it2161.s243168t.movieviewer.ui.screens.ProfileScreen
 import com.it2161.s243168t.movieviewer.ui.screens.RegistrationScreen
-import com.it2161.s243168t.movieviewer.ui.screens.SearchScreen
-
 @Composable
 fun NavGraph(
     modifier: Modifier = Modifier,
@@ -41,6 +39,5 @@ fun NavGraph(
             }
         }
         composable(Routes.Favorites.route) { FavoritesScreen(navController = navController) }
-        composable(Routes.Search.route) { SearchScreen(navController = navController) }
     }
 }

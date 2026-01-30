@@ -9,5 +9,4 @@ sealed class Routes(val route: String) {
         fun createRoute(movieId: Int) = "movie_detail/$movieId"
     }
     object Favorites : Routes("favorites")
-    object Search : Routes("search")
 }

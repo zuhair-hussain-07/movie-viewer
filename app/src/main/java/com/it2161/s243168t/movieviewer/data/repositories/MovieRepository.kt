@@ -65,24 +65,17 @@ class MovieRepository @Inject constructor(
         val isOnline = networkObserver.isConnected.firstOrNull() ?: false
         if (isOnline) {
             try {
-                // The getMovieDetails endpoint returns a single MovieDto, not a MovieResponse
-                val apiResponse = tmdbApiService.getMovieDetails(movieId)
+                // The getMovieDetails endpoint returns a single MovieDto object
+                val movieDto = tmdbApiService.getMovieDetails(movieId)
+                val movie = movieDto.toMovie()
 
-                // Handle single movie from results
-                val movieDto = apiResponse.results.firstOrNull()
-                if (movieDto != null) {
-                    val movie = movieDto.toMovie()
-
-                    // Upsert the updated movie to DB
-                    withContext(Dispatchers.IO) {
-                        movieDao.upsertMovies(listOf(movie))
-                    }
-
-                    // Emit all updates from DAO's Flow
-                    emitAll(movieDao.getAllMovies().firstOrNull()?.let { movies ->
-                        flow { emit(movies.find { it.id == movieId }) }
-                    } ?: flow { emit(null) })
+                // Upsert the updated movie to DB
+                withContext(Dispatchers.IO) {
+                    movieDao.upsertMovies(listOf(movie))
                 }
+
+                // Emit the updated movie
+                emit(movie)
             } catch (e: Exception) {
                 // On error, keep showing cached data (already emitted)
                 e.printStackTrace()

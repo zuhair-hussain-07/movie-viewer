@@ -8,7 +8,7 @@ data class MovieDto(
     @SerializedName("adult")
     val adult: Boolean,
     @SerializedName("genres")
-    val genres: List<String>? = null,
+    val genres: List<GenreDto>? = null,
     @SerializedName("original_language")
     val originalLanguage: String,
     @SerializedName("title")

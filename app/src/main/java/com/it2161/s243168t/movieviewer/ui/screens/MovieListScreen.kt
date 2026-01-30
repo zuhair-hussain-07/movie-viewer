@@ -57,8 +57,7 @@ fun MovieListScreen(
                     snackbarHostState.showSnackbar(effect.message)
                 }
                 is MovieUiEffect.NavigateToDetail -> {
-                    // TODO: Navigate to movie detail screen
-                    snackbarHostState.showSnackbar("Movie ${effect.movieId} clicked")
+                    navController.navigate(Routes.MovieDetail.createRoute(effect.movieId))
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.it2161.s243168t.movieviewer.data.remote.api
 
+import com.it2161.s243168t.movieviewer.data.remote.dtos.MovieDto
 import com.it2161.s243168t.movieviewer.data.remote.responses.MovieResponse
 import com.it2161.s243168t.movieviewer.data.remote.responses.ReviewResponse
 import retrofit2.http.GET
@@ -32,7 +33,7 @@ interface TMDBApiService {
     @GET("movie/{movieId}")
     suspend fun getMovieDetails(
         @Path("movieId") movieId: Int,
-    ): MovieResponse
+    ): MovieDto
 
     @GET("movie/{movieId}/reviews")
     suspend fun getMovieReviews(

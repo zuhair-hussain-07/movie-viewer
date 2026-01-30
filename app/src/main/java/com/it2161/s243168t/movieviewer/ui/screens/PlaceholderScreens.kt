@@ -5,11 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 
 @Composable
-fun MovieDetailScreen(navController: NavController, movieId: Int) {
-    Text("Movie Detail Screen for movieId: $movieId")
-}
-
-@Composable
 fun FavoritesScreen(navController: NavController) {
     Text("Favorites Screen")
 }

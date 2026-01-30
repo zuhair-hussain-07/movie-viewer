@@ -11,7 +11,7 @@ object MovieMapper {
         return Movie(
             id = id,
             adult = adult,
-            genres = genres ?: emptyList(),
+            genres = genres?.map { it.name } ?: emptyList(),
             originalLanguage = originalLanguage,
             title = title,
             releaseDate = releaseDate,

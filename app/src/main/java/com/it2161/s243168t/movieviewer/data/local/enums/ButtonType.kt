@@ -4,5 +4,6 @@ enum class ButtonType {
     TEXT,
     PRIMARY_BUTTON,
     SECONDARY_BUTTON,
-    SELECTABLE_BUTTON
+    SELECTABLE_BUTTON,
+    ICON_TEXT
 }

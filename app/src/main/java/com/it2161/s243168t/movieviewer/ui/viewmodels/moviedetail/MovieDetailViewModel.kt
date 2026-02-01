@@ -100,8 +100,11 @@ class MovieDetailViewModel @Inject constructor(
 
     private fun handleToggleFavorite(@Suppress("UNUSED_PARAMETER") movieId: Int) {
         viewModelScope.launch {
+            val currentFavorite = _uiState.value.isFavorite
+            _uiState.value = _uiState.value.copy(isFavorite = !currentFavorite)
             // TODO: Implement favorite toggling logic (save to local preferences/db)
-            emitEffect(MovieDetailUiEffect.ShowToast("Movie added to favorites"))
+            val message = if (!currentFavorite) "Movie added to favorites" else "Movie removed from favorites"
+            emitEffect(MovieDetailUiEffect.ShowToast(message))
         }
     }
 

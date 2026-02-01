@@ -8,5 +8,6 @@ data class MovieDetailUiState(
     val reviews: List<Review> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val isOnline: Boolean = true
+    val isOnline: Boolean = true,
+    val isFavorite: Boolean = false
 )

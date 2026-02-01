@@ -15,6 +15,9 @@ interface MovieDao {
     @Query("SELECT * FROM movies")
     fun getAllMovies(): Flow<List<Movie>>
 
-    @Query("DELETE FROM movies")
-    suspend fun clearAllMovies()
+    @Query("DELETE FROM movies WHERE id NOT IN (:favoriteIds)")
+    suspend fun clearAllMovies(favoriteIds: List<Int>)
+
+    @Query("SELECT * FROM movies WHERE id IN (:ids)")
+    fun getMoviesByIds(ids: List<Int>): Flow<List<Movie>>
 }

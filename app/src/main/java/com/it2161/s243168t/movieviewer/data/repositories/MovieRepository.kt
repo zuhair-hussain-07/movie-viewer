@@ -2,6 +2,7 @@ package com.it2161.s243168t.movieviewer.data.repositories
 
 import com.it2161.s243168t.movieviewer.data.local.daos.MovieDao
 import com.it2161.s243168t.movieviewer.data.local.daos.ReviewDao
+import com.it2161.s243168t.movieviewer.data.local.datastore.FavouritesDataStore
 import com.it2161.s243168t.movieviewer.data.local.models.Movie
 import com.it2161.s243168t.movieviewer.data.local.models.Review
 import com.it2161.s243168t.movieviewer.data.mappers.MovieMapper.toMovie
@@ -11,8 +12,10 @@ import com.it2161.s243168t.movieviewer.utils.NetworkObserver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -20,7 +23,8 @@ class MovieRepository @Inject constructor(
     private val tmdbApiService: TMDBApiService,
     private val movieDao: MovieDao,
     private val reviewDao: ReviewDao,
-    private val networkObserver: NetworkObserver
+    private val networkObserver: NetworkObserver,
+    private val favouritesDataStore: FavouritesDataStore
 ) {
 
     fun getMovies(category: String): Flow<List<Movie>> = flow {
@@ -40,9 +44,13 @@ class MovieRepository @Inject constructor(
                     else -> return@flow
                 }
 
-                // Clear old movies and save new ones
+                // Get current favorite IDs to preserve them during cache clear
+                val favoriteIds = favouritesDataStore.getFavouriteIds().first()
+                    .mapNotNull { it.toIntOrNull() }
+
+                // Clear old movies (except favorites) and save new ones
                 withContext(Dispatchers.IO) {
-                    movieDao.clearAllMovies()
+                    movieDao.clearAllMovies(favoriteIds)
                     val movies = apiResponse.results.map { it.toMovie() }
                     movieDao.upsertMovies(movies)
                 }
@@ -120,9 +128,13 @@ class MovieRepository @Inject constructor(
             try {
                 val apiResponse = tmdbApiService.searchMovies(query)
 
-                // Clear old cache and save new search results
+                // Get current favorite IDs to preserve them during cache clear
+                val favoriteIds = favouritesDataStore.getFavouriteIds().first()
+                    .mapNotNull { it.toIntOrNull() }
+
+                // Clear old cache (except favorites) and save new search results
                 withContext(Dispatchers.IO) {
-                    movieDao.clearAllMovies()
+                    movieDao.clearAllMovies(favoriteIds)
                     val movies = apiResponse.results.map { it.toMovie() }
                     movieDao.upsertMovies(movies)
                 }
@@ -135,5 +147,63 @@ class MovieRepository @Inject constructor(
             }
         }
         // If offline, cached data is already emitted - user sees last successful results
+    }
+
+    suspend fun toggleFavourite(movieId: Int) {
+        favouritesDataStore.toggleFavourite(movieId)
+    }
+
+    fun isMovieFavourited(movieId: Int): Flow<Boolean> {
+        return favouritesDataStore.getFavouriteIds().map { ids ->
+            ids.contains(movieId.toString())
+        }
+    }
+
+    fun getFavouritedMovies(): Flow<List<Movie>> = flow {
+        // Collect current favorite IDs
+        val favoriteIds = favouritesDataStore.getFavouriteIds().first()
+            .mapNotNull { it.toIntOrNull() }
+
+        if (favoriteIds.isEmpty()) {
+            emit(emptyList())
+            return@flow
+        }
+
+        // Get movies from local database
+        val localMovies = movieDao.getMoviesByIds(favoriteIds).firstOrNull() ?: emptyList()
+        val localMovieIds = localMovies.map { it.id }.toSet()
+
+        // Find missing movie IDs (in DataStore but not in Room)
+        val missingIds = favoriteIds.filter { it !in localMovieIds }
+
+        if (missingIds.isNotEmpty()) {
+            // Check if network is available to fetch missing movies
+            val isOnline = networkObserver.isConnected.firstOrNull() ?: false
+            if (isOnline) {
+                try {
+                    // Fetch missing movies from API and upsert them
+                    val fetchedMovies = missingIds.mapNotNull { movieId ->
+                        try {
+                            val movieDto = tmdbApiService.getMovieDetails(movieId)
+                            movieDto.toMovie()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            null
+                        }
+                    }
+
+                    if (fetchedMovies.isNotEmpty()) {
+                        withContext(Dispatchers.IO) {
+                            movieDao.upsertMovies(fetchedMovies)
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+
+        // Emit all updates from DAO's Flow
+        emitAll(movieDao.getMoviesByIds(favoriteIds))
     }
 }

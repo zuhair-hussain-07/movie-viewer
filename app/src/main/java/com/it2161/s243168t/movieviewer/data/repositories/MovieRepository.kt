@@ -38,6 +38,7 @@ class MovieRepository @Inject constructor(
         val isOnline = networkObserver.isConnected.firstOrNull() ?: false
         if (isOnline) {
             try {
+                // Fetch data from API first
                 val apiResponse = when (category) {
                     "popular" -> tmdbApiService.getPopularMovies()
                     "top_rated" -> tmdbApiService.getTopRatedMovies()
@@ -46,15 +47,16 @@ class MovieRepository @Inject constructor(
                     else -> return@flow
                 }
 
-                // Get current favorite IDs to preserve them during cache clear
+                // Get current favorite IDs to preserve them during refresh
                 val favoriteIds = favouritesDataStore.getFavouriteIds().first()
                     .mapNotNull { it.toIntOrNull() }
 
-                // Clear old movies (except favorites) and save new ones with category
+                // Map API results to Movie entities
+                val movies = apiResponse.results.map { it.toMovie(category) }
+
+                // Use transactional refresh for atomic database update (no UI flicker)
                 withContext(Dispatchers.IO) {
-                    movieDao.clearAllMovies(favoriteIds)
-                    val movies = apiResponse.results.map { it.toMovie(category) }
-                    movieDao.upsertMovies(movies)
+                    movieDao.transactionalRefresh(movies, favoriteIds)
                 }
 
                 // Emit all updates from DAO's Flow for this category
@@ -132,17 +134,19 @@ class MovieRepository @Inject constructor(
         val isOnline = networkObserver.isConnected.firstOrNull() ?: false
         if (isOnline) {
             try {
+                // Fetch data from API first
                 val apiResponse = tmdbApiService.searchMovies(query)
 
-                // Get current favorite IDs to preserve them during cache clear
+                // Get current favorite IDs to preserve them during refresh
                 val favoriteIds = favouritesDataStore.getFavouriteIds().first()
                     .mapNotNull { it.toIntOrNull() }
 
-                // Clear old cache (except favorites) and save new search results
+                // Map API results to Movie entities
+                val movies = apiResponse.results.map { it.toMovie(searchCategory) }
+
+                // Use transactional refresh for atomic database update (no UI flicker)
                 withContext(Dispatchers.IO) {
-                    movieDao.clearAllMovies(favoriteIds)
-                    val movies = apiResponse.results.map { it.toMovie(searchCategory) }
-                    movieDao.upsertMovies(movies)
+                    movieDao.transactionalRefresh(movies, favoriteIds)
                 }
 
                 // Emit all updates from DAO's Flow for search category

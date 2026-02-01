@@ -34,12 +34,15 @@ import com.it2161.s243168t.movieviewer.ui.theme.Dimens
 import com.it2161.s243168t.movieviewer.ui.viewmodels.favorites.FavoritesUiEffect
 import com.it2161.s243168t.movieviewer.ui.viewmodels.favorites.FavoritesUiEvent
 import com.it2161.s243168t.movieviewer.ui.viewmodels.favorites.FavoritesViewModel
+import com.it2161.s243168t.movieviewer.ui.viewmodels.authentication.AuthViewModel
+import com.it2161.s243168t.movieviewer.ui.viewmodels.authentication.AuthUiEvent
 
 @Composable
 fun FavoritesScreen(
     navController: NavController,
     currentRoute: String = Routes.Favorites.route,
-    viewModel: FavoritesViewModel = hiltViewModel()
+    viewModel: FavoritesViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -57,6 +60,19 @@ fun FavoritesScreen(
         }
     }
 
+    LaunchedEffect(key1 = true) {
+        authViewModel.uiEffect.collect { effect ->
+            when (effect) {
+                is com.it2161.s243168t.movieviewer.ui.viewmodels.authentication.AuthUiEffect.Navigate -> {
+                    navController.navigate(effect.route) {
+                        popUpTo(Routes.MovieList.route) { inclusive = true }
+                    }
+                }
+                else -> {}
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             MovieAppTopAppBar(
@@ -65,9 +81,7 @@ fun FavoritesScreen(
                 onNavigateBack = {},
                 showOverflowMenu = true,
                 onLogout = {
-                    navController.navigate(Routes.Login.route) {
-                        popUpTo(Routes.MovieList.route) { inclusive = true }
-                    }
+                    authViewModel.onEvent(AuthUiEvent.OnLogoutClicked)
                 }
             )
         },

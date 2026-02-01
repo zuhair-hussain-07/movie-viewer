@@ -2,6 +2,7 @@ package com.it2161.s243168t.movieviewer.ui.viewmodels.authentication
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.it2161.s243168t.movieviewer.data.SessionManager
 import com.it2161.s243168t.movieviewer.data.local.models.User
 import com.it2161.s243168t.movieviewer.data.repositories.AuthRepository
 import com.it2161.s243168t.movieviewer.ui.navigation.Routes
@@ -20,7 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AuthUiState())
@@ -41,6 +43,7 @@ class AuthViewModel @Inject constructor(
             AuthUiEvent.ToggleConfirmPasswordVisibility -> _uiState.update { it.copy(isConfirmPasswordVisible = !it.isConfirmPasswordVisible) }
             AuthUiEvent.OnLoginClicked -> loginUser()
             AuthUiEvent.OnRegisterClicked -> registerUser()
+            AuthUiEvent.OnLogoutClicked -> logoutUser()
         }
     }
 
@@ -118,6 +121,17 @@ class AuthViewModel @Inject constructor(
                 emitEffect(AuthUiEffect.ShowSnackbar("Invalid credentials"))
             }
             _uiState.update { it.copy(isLoading = false) }
+        }
+    }
+
+    private fun logoutUser() {
+        viewModelScope.launch {
+            // Clear the session first
+            sessionManager.clearSession()
+            // Reset the UI state
+            _uiState.value = AuthUiState()
+            // Navigate to login
+            emitEffect(AuthUiEffect.Navigate(Routes.Login.route))
         }
     }
 

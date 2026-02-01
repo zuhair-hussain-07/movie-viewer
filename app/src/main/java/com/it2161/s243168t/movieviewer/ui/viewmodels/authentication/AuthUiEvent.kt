@@ -11,4 +11,5 @@ sealed class AuthUiEvent {
     object ToggleConfirmPasswordVisibility : AuthUiEvent()
     object OnLoginClicked : AuthUiEvent()
     object OnRegisterClicked : AuthUiEvent()
+    object OnLogoutClicked : AuthUiEvent()
 }

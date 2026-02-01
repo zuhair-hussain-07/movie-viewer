@@ -66,6 +66,8 @@ import com.it2161.s243168t.movieviewer.ui.theme.Dimens
 import com.it2161.s243168t.movieviewer.ui.viewmodels.moviedetail.MovieDetailUiEffect
 import com.it2161.s243168t.movieviewer.ui.viewmodels.moviedetail.MovieDetailUiEvent
 import com.it2161.s243168t.movieviewer.ui.viewmodels.moviedetail.MovieDetailViewModel
+import com.it2161.s243168t.movieviewer.ui.viewmodels.authentication.AuthViewModel
+import com.it2161.s243168t.movieviewer.ui.viewmodels.authentication.AuthUiEvent
 import com.it2161.s243168t.movieviewer.utils.formatRevenue
 import com.it2161.s243168t.movieviewer.utils.formatRuntime
 import java.text.NumberFormat
@@ -73,7 +75,11 @@ import java.util.Locale
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun MovieDetailScreen(navController: NavController, movieId: Int) {
+fun MovieDetailScreen(
+    navController: NavController,
+    movieId: Int,
+    authViewModel: AuthViewModel = hiltViewModel()
+) {
     val viewModel: MovieDetailViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -87,6 +93,19 @@ fun MovieDetailScreen(navController: NavController, movieId: Int) {
         }
     }
 
+    LaunchedEffect(key1 = true) {
+        authViewModel.uiEffect.collect { effect ->
+            when (effect) {
+                is com.it2161.s243168t.movieviewer.ui.viewmodels.authentication.AuthUiEffect.Navigate -> {
+                    navController.navigate(effect.route) {
+                        popUpTo(Routes.MovieList.route) { inclusive = true }
+                    }
+                }
+                else -> {}
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             MovieAppTopAppBar(
@@ -95,9 +114,7 @@ fun MovieDetailScreen(navController: NavController, movieId: Int) {
                 onNavigateBack = { navController.popBackStack() },
                 showOverflowMenu = true,
                 onLogout = {
-                    navController.navigate(Routes.Login.route) {
-                        popUpTo(Routes.MovieList.route) { inclusive = true }
-                    }
+                    authViewModel.onEvent(AuthUiEvent.OnLogoutClicked)
                 }
             )
         },

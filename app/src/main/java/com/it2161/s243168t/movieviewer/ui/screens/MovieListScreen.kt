@@ -38,14 +38,18 @@ import com.it2161.s243168t.movieviewer.ui.theme.Dimens
 import com.it2161.s243168t.movieviewer.ui.viewmodels.movielist.MovieUiEffect
 import com.it2161.s243168t.movieviewer.ui.viewmodels.movielist.MovieUiEvent
 import com.it2161.s243168t.movieviewer.ui.viewmodels.movielist.MovieViewModel
+import com.it2161.s243168t.movieviewer.ui.viewmodels.authentication.AuthViewModel
+import com.it2161.s243168t.movieviewer.ui.viewmodels.authentication.AuthUiEvent
 
 @Composable
 fun MovieListScreen(
     navController: NavController,
     currentRoute: String = Routes.MovieList.route,
-    viewModel: MovieViewModel = hiltViewModel()
+    viewModel: MovieViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val authUiState by authViewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(key1 = true) {
@@ -57,6 +61,19 @@ fun MovieListScreen(
                 is MovieUiEffect.NavigateToDetail -> {
                     navController.navigate(Routes.MovieDetail.createRoute(effect.movieId))
                 }
+            }
+        }
+    }
+
+    LaunchedEffect(key1 = true) {
+        authViewModel.uiEffect.collect { effect ->
+            when (effect) {
+                is com.it2161.s243168t.movieviewer.ui.viewmodels.authentication.AuthUiEffect.Navigate -> {
+                    navController.navigate(effect.route) {
+                        popUpTo(Routes.MovieList.route) { inclusive = true }
+                    }
+                }
+                else -> {}
             }
         }
     }
@@ -77,9 +94,7 @@ fun MovieListScreen(
                 onNavigateBack = {},
                 showOverflowMenu = true,
                 onLogout = {
-                    navController.navigate(Routes.Login.route) {
-                        popUpTo(Routes.MovieList.route) { inclusive = true }
-                    }
+                    authViewModel.onEvent(AuthUiEvent.OnLogoutClicked)
                 }
             )
         },

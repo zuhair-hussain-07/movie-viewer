@@ -7,5 +7,6 @@ data class MovieUiState(
     val isLoading: Boolean = false,
     val selectedCategory: String = "popular",
     val searchQuery: String = "",
-    val isOnline: Boolean = true
+    val isOnline: Boolean = true,
+    val favoriteIds: Set<Int> = emptySet()
 )

@@ -35,6 +35,7 @@ class MovieDetailViewModel @Inject constructor(
         // Load movie details if movieId is valid
         if (movieId > 0) {
             loadMovieDetail(movieId)
+            observeFavoriteStatus(movieId)
         } else {
             viewModelScope.launch {
                 emitEffect(MovieDetailUiEffect.ShowToast("Invalid movie ID"))
@@ -46,6 +47,14 @@ class MovieDetailViewModel @Inject constructor(
         viewModelScope.launch {
             networkObserver.isConnected.collect { isConnected ->
                 _uiState.value = _uiState.value.copy(isOnline = isConnected)
+            }
+        }
+    }
+
+    private fun observeFavoriteStatus(movieId: Int) {
+        viewModelScope.launch {
+            movieRepository.isMovieFavourited(movieId).collect { isFavorite ->
+                _uiState.value = _uiState.value.copy(isFavorite = isFavorite)
             }
         }
     }
@@ -98,13 +107,17 @@ class MovieDetailViewModel @Inject constructor(
         loadMovieDetail(movieId)
     }
 
-    private fun handleToggleFavorite(@Suppress("UNUSED_PARAMETER") movieId: Int) {
+    private fun handleToggleFavorite(movieId: Int) {
         viewModelScope.launch {
-            val currentFavorite = _uiState.value.isFavorite
-            _uiState.value = _uiState.value.copy(isFavorite = !currentFavorite)
-            // TODO: Implement favorite toggling logic (save to local preferences/db)
-            val message = if (!currentFavorite) "Movie added to favorites" else "Movie removed from favorites"
-            emitEffect(MovieDetailUiEffect.ShowToast(message))
+            try {
+                val currentFavorite = _uiState.value.isFavorite
+                movieRepository.toggleFavourite(movieId)
+                val message = if (currentFavorite) "Movie removed from favorites" else "Movie added to favorites"
+                emitEffect(MovieDetailUiEffect.ShowToast(message))
+            } catch (e: Exception) {
+                emitEffect(MovieDetailUiEffect.ShowToast("Error updating favorites"))
+                e.printStackTrace()
+            }
         }
     }
 

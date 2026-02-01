@@ -222,6 +222,10 @@ fun MovieListScreen(
                                 movie = movie,
                                 onClick = {
                                     viewModel.onEvent(MovieUiEvent.OnMovieClicked(movie.id))
+                                },
+                                isFavorite = movie.id in uiState.favoriteIds,
+                                onToggleFavorite = {
+                                    viewModel.onEvent(MovieUiEvent.ToggleFavorite(movie))
                                 }
                             )
                         }

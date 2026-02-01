@@ -2,6 +2,7 @@ package com.it2161.s243168t.movieviewer.ui.viewmodels.movielist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.it2161.s243168t.movieviewer.data.local.models.Movie
 import com.it2161.s243168t.movieviewer.data.repositories.MovieRepository
 import com.it2161.s243168t.movieviewer.utils.NetworkObserver
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,6 +37,9 @@ class MovieViewModel @Inject constructor(
         // Observe network connectivity
         observeNetworkStatus()
 
+        // Observe favorite IDs
+        observeFavoriteIds()
+
         // Load initial category (popular)
         loadMovies(_uiState.value.selectedCategory)
 
@@ -47,6 +51,14 @@ class MovieViewModel @Inject constructor(
         viewModelScope.launch {
             networkObserver.isConnected.collect { isConnected ->
                 _uiState.update { it.copy(isOnline = isConnected) }
+            }
+        }
+    }
+
+    private fun observeFavoriteIds() {
+        viewModelScope.launch {
+            movieRepository.getFavouriteIds().collect { favoriteIds ->
+                _uiState.update { it.copy(favoriteIds = favoriteIds) }
             }
         }
     }
@@ -69,6 +81,7 @@ class MovieViewModel @Inject constructor(
             is MovieUiEvent.OnCategoryChanged -> handleCategoryChange(event.category)
             is MovieUiEvent.OnSearchQueryChanged -> handleSearchQueryChange(event.query)
             is MovieUiEvent.OnMovieClicked -> handleMovieClicked(event.movieId)
+            is MovieUiEvent.ToggleFavorite -> handleToggleFavorite(event.movie)
             MovieUiEvent.RefreshList -> handleRefresh()
         }
     }
@@ -117,6 +130,24 @@ class MovieViewModel @Inject constructor(
             loadMovies(_uiState.value.selectedCategory)
         } else {
             performSearch(currentQuery)
+        }
+    }
+
+    private fun handleToggleFavorite(movie: Movie) {
+        viewModelScope.launch {
+            try {
+                movieRepository.toggleFavourite(movie.id)
+                val isFavorite = _uiState.value.favoriteIds.contains(movie.id)
+                val message = if (isFavorite) {
+                    "${movie.title} added to favorites"
+                } else {
+                    "${movie.title} removed from favorites"
+                }
+                emitEffect(MovieUiEffect.ShowSnackbar(message))
+            } catch (e: Exception) {
+                emitEffect(MovieUiEffect.ShowSnackbar("Error updating favorites"))
+                e.printStackTrace()
+            }
         }
     }
 

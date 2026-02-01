@@ -149,6 +149,12 @@ class MovieRepository @Inject constructor(
         // If offline, cached data is already emitted - user sees last successful results
     }
 
+    fun getFavouriteIds(): Flow<Set<Int>> {
+        return favouritesDataStore.getFavouriteIds().map { ids ->
+            ids.mapNotNull { it.toIntOrNull() }.toSet()
+        }
+    }
+
     suspend fun toggleFavourite(movieId: Int) {
         favouritesDataStore.toggleFavourite(movieId)
     }

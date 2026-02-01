@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -85,33 +86,19 @@ fun ButtonComponent(
             }
         }
         ButtonType.ICON_TEXT -> {
-            Button(
+            IconButton (
                 onClick = onClick,
-                modifier = modifier.padding(vertical = 4.dp),
-                enabled = enabled,
-                shape = shape,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                modifier = modifier, // You might not need padding here as IconButton has internal padding
+                enabled = enabled
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    if (icon != null) {
-                        Icon(
-                            imageVector = icon,
-                            contentDescription = iconContentDescription,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        if (text.isNotEmpty()) {
-                            Spacer(modifier = Modifier.width(8.dp))
-                        }
-                    }
-                    if (text.isNotEmpty()) {
-                        Text(text)
-                    }
+                if (icon != null) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = iconContentDescription,
+                        // Tint: Primary color if selected/active, standard Gray/OnSurface if not
+                        tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(24.dp) // Standard Material icon size
+                    )
                 }
             }
         }

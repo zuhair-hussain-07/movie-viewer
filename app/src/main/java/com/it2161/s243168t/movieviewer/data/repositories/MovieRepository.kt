@@ -13,8 +13,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -28,8 +30,8 @@ class MovieRepository @Inject constructor(
 ) {
 
     fun getMovies(category: String): Flow<List<Movie>> = flow {
-        // Emit initial cached value
-        val cachedMovies = movieDao.getAllMovies().firstOrNull() ?: emptyList()
+        // Emit initial cached value for this specific category
+        val cachedMovies = movieDao.getMoviesByCategory(category).firstOrNull() ?: emptyList()
         emit(cachedMovies)
 
         // Check if network is available
@@ -48,15 +50,15 @@ class MovieRepository @Inject constructor(
                 val favoriteIds = favouritesDataStore.getFavouriteIds().first()
                     .mapNotNull { it.toIntOrNull() }
 
-                // Clear old movies (except favorites) and save new ones
+                // Clear old movies (except favorites) and save new ones with category
                 withContext(Dispatchers.IO) {
                     movieDao.clearAllMovies(favoriteIds)
-                    val movies = apiResponse.results.map { it.toMovie() }
+                    val movies = apiResponse.results.map { it.toMovie(category) }
                     movieDao.upsertMovies(movies)
                 }
 
-                // Emit all updates from DAO's Flow
-                emitAll(movieDao.getAllMovies())
+                // Emit all updates from DAO's Flow for this category
+                emitAll(movieDao.getMoviesByCategory(category))
             } catch (e: Exception) {
                 // On error, keep showing cached data (already emitted)
                 e.printStackTrace()
@@ -67,7 +69,8 @@ class MovieRepository @Inject constructor(
     fun getMovieDetails(movieId: Int): Flow<Movie?> = flow {
         // Emit initial cached value
         val cachedMovies = movieDao.getAllMovies().firstOrNull() ?: emptyList()
-        emit(cachedMovies.find { it.id == movieId })
+        val existingMovie = cachedMovies.find { it.id == movieId }
+        emit(existingMovie)
 
         // Check if network is available
         val isOnline = networkObserver.isConnected.firstOrNull() ?: false
@@ -75,7 +78,8 @@ class MovieRepository @Inject constructor(
             try {
                 // The getMovieDetails endpoint returns a single MovieDto object
                 val movieDto = tmdbApiService.getMovieDetails(movieId)
-                val movie = movieDto.toMovie()
+                // Preserve the existing category if movie was already in DB
+                val movie = movieDto.toMovie(existingMovie?.category ?: "")
 
                 // Upsert the updated movie to DB
                 withContext(Dispatchers.IO) {
@@ -118,8 +122,10 @@ class MovieRepository @Inject constructor(
     }
 
     fun searchMovies(query: String): Flow<List<Movie>> = flow {
-        // Emit initial cached value (last search/category results)
-        val cachedMovies = movieDao.getAllMovies().firstOrNull() ?: emptyList()
+        val searchCategory = "search"
+
+        // Emit initial cached value for search results
+        val cachedMovies = movieDao.getMoviesByCategory(searchCategory).firstOrNull() ?: emptyList()
         emit(cachedMovies)
 
         // Check if network is available
@@ -135,12 +141,12 @@ class MovieRepository @Inject constructor(
                 // Clear old cache (except favorites) and save new search results
                 withContext(Dispatchers.IO) {
                     movieDao.clearAllMovies(favoriteIds)
-                    val movies = apiResponse.results.map { it.toMovie() }
+                    val movies = apiResponse.results.map { it.toMovie(searchCategory) }
                     movieDao.upsertMovies(movies)
                 }
 
-                // Emit all updates from DAO's Flow
-                emitAll(movieDao.getAllMovies())
+                // Emit all updates from DAO's Flow for search category
+                emitAll(movieDao.getMoviesByCategory(searchCategory))
             } catch (e: Exception) {
                 // On error, keep showing cached data (already emitted)
                 e.printStackTrace()
@@ -165,51 +171,52 @@ class MovieRepository @Inject constructor(
         }
     }
 
-    fun getFavouritedMovies(): Flow<List<Movie>> = flow {
-        // Collect current favorite IDs
-        val favoriteIds = favouritesDataStore.getFavouriteIds().first()
-            .mapNotNull { it.toIntOrNull() }
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    fun getFavouritedMovies(): Flow<List<Movie>> = favouritesDataStore.getFavouriteIds()
+        .flatMapLatest { idsSet ->
+            val favoriteIds = idsSet.mapNotNull { it.toIntOrNull() }
 
-        if (favoriteIds.isEmpty()) {
-            emit(emptyList())
-            return@flow
-        }
+            if (favoriteIds.isEmpty()) {
+                flowOf(emptyList())
+            } else {
+                flow {
+                    // Get movies from local database
+                    val localMovies = movieDao.getMoviesByIds(favoriteIds).firstOrNull() ?: emptyList()
+                    val localMovieIds = localMovies.map { it.id }.toSet()
 
-        // Get movies from local database
-        val localMovies = movieDao.getMoviesByIds(favoriteIds).firstOrNull() ?: emptyList()
-        val localMovieIds = localMovies.map { it.id }.toSet()
+                    // Find missing movie IDs (in DataStore but not in Room)
+                    val missingIds = favoriteIds.filter { it !in localMovieIds }
 
-        // Find missing movie IDs (in DataStore but not in Room)
-        val missingIds = favoriteIds.filter { it !in localMovieIds }
+                    if (missingIds.isNotEmpty()) {
+                        // Check if network is available to fetch missing movies
+                        val isOnline = networkObserver.isConnected.firstOrNull() ?: false
+                        if (isOnline) {
+                            try {
+                                // Fetch missing movies from API and upsert them with "favorites" category
+                                val fetchedMovies = missingIds.mapNotNull { movieId ->
+                                    try {
+                                        val movieDto = tmdbApiService.getMovieDetails(movieId)
+                                        movieDto.toMovie("favorites")
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                        null
+                                    }
+                                }
 
-        if (missingIds.isNotEmpty()) {
-            // Check if network is available to fetch missing movies
-            val isOnline = networkObserver.isConnected.firstOrNull() ?: false
-            if (isOnline) {
-                try {
-                    // Fetch missing movies from API and upsert them
-                    val fetchedMovies = missingIds.mapNotNull { movieId ->
-                        try {
-                            val movieDto = tmdbApiService.getMovieDetails(movieId)
-                            movieDto.toMovie()
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                            null
+                                if (fetchedMovies.isNotEmpty()) {
+                                    withContext(Dispatchers.IO) {
+                                        movieDao.upsertMovies(fetchedMovies)
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
                         }
                     }
 
-                    if (fetchedMovies.isNotEmpty()) {
-                        withContext(Dispatchers.IO) {
-                            movieDao.upsertMovies(fetchedMovies)
-                        }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                    // Emit all updates from DAO's Flow
+                    emitAll(movieDao.getMoviesByIds(favoriteIds))
                 }
             }
         }
-
-        // Emit all updates from DAO's Flow
-        emitAll(movieDao.getMoviesByIds(favoriteIds))
-    }
 }

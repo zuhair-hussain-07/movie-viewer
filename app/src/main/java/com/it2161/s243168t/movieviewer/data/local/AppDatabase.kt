@@ -12,7 +12,7 @@ import com.it2161.s243168t.movieviewer.data.local.models.Movie
 import com.it2161.s243168t.movieviewer.data.local.models.Review
 import com.it2161.s243168t.movieviewer.data.local.models.User
 
-@Database(entities = [User::class, Movie::class, Review::class], version = 2, exportSchema = false)
+@Database(entities = [User::class, Movie::class, Review::class], version = 4, exportSchema = false)
 @TypeConverters(DateConverters::class, GenreConverters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao

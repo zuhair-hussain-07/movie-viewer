@@ -18,5 +18,6 @@ data class Movie(
     val voteAverage: Double,
     val revenue: Long,
     val posterPath: String,
-    val backdropPath: String
+    val backdropPath: String,
+    val category: String = ""
 )

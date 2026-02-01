@@ -6,8 +6,10 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 private val Context.favouritesDataStore: DataStore<Preferences> by preferencesDataStore(
     name = "favourites_preferences"
@@ -31,7 +33,7 @@ class FavouritesDataStore(
         }
     }
 
-    suspend fun toggleFavourite(movieId: Int) {
+    suspend fun toggleFavourite(movieId: Int) = withContext(Dispatchers.IO) {
         context.favouritesDataStore.edit { preferences ->
             val currentIdsString = preferences[FAVOURITE_IDS_KEY] ?: ""
             val currentIds = if (currentIdsString.isBlank()) {

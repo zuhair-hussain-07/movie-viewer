@@ -134,14 +134,17 @@ class MovieViewModel @Inject constructor(
     }
 
     private fun handleToggleFavorite(movie: Movie) {
+        // Check current state BEFORE toggle to determine correct message
+        val wasAlreadyFavorite = _uiState.value.favoriteIds.contains(movie.id)
+
         viewModelScope.launch {
             try {
                 movieRepository.toggleFavourite(movie.id)
-                val isFavorite = _uiState.value.favoriteIds.contains(movie.id)
-                val message = if (isFavorite) {
-                    "${movie.title} added to favorites"
-                } else {
+                // Message reflects the action taken (opposite of previous state)
+                val message = if (wasAlreadyFavorite) {
                     "${movie.title} removed from favorites"
+                } else {
+                    "${movie.title} added to favorites"
                 }
                 emitEffect(MovieUiEffect.ShowSnackbar(message))
             } catch (e: Exception) {
@@ -153,15 +156,27 @@ class MovieViewModel @Inject constructor(
 
     private fun loadMovies(category: String) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            var isFirstEmission = true
 
             try {
                 movieRepository.getMovies(category).collect { movies ->
-                    _uiState.update {
-                        it.copy(
-                            movies = movies,
-                            isLoading = false
-                        )
+                    if (isFirstEmission) {
+                        isFirstEmission = false
+                        // Only show loading if cached data is empty
+                        if (movies.isEmpty()) {
+                            _uiState.update { it.copy(isLoading = true, movies = movies) }
+                        } else {
+                            // Show cached data immediately without loading
+                            _uiState.update { it.copy(movies = movies, isLoading = false) }
+                        }
+                    } else {
+                        // Subsequent emissions (from API) - update movies and hide loading
+                        _uiState.update {
+                            it.copy(
+                                movies = movies,
+                                isLoading = false
+                            )
+                        }
                     }
                 }
             } catch (e: Exception) {
@@ -174,15 +189,25 @@ class MovieViewModel @Inject constructor(
 
     private fun performSearch(query: String) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            var isFirstEmission = true
 
             try {
                 movieRepository.searchMovies(query).collect { movies ->
-                    _uiState.update {
-                        it.copy(
-                            movies = movies,
-                            isLoading = false
-                        )
+                    if (isFirstEmission) {
+                        isFirstEmission = false
+                        // Only show loading if cached data is empty
+                        if (movies.isEmpty()) {
+                            _uiState.update { it.copy(isLoading = true, movies = movies) }
+                        } else {
+                            _uiState.update { it.copy(movies = movies, isLoading = false) }
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                movies = movies,
+                                isLoading = false
+                            )
+                        }
                     }
                 }
             } catch (e: Exception) {

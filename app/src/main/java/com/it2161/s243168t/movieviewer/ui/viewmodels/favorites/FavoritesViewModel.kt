@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,42 +27,38 @@ class FavoritesViewModel @Inject constructor(
     val uiEffect = _uiEffect.asSharedFlow()
 
     init {
-        loadFavorites()
-        observeFavoriteIds()
+        observeFavorites()
     }
 
-    private fun observeFavoriteIds() {
+    private fun observeFavorites() {
         viewModelScope.launch {
+            // Observe both favorite IDs and movies reactively
             movieRepository.getFavouriteIds().collect { favoriteIds ->
                 _uiState.update { it.copy(favoriteIds = favoriteIds) }
-                // Reload favorites when IDs change
-                loadFavorites()
             }
         }
-    }
 
-    private fun loadFavorites() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-
-            try {
-                movieRepository.getFavouritedMovies().collect { movies ->
+            movieRepository.getFavouritedMovies()
+                .onStart { _uiState.update { it.copy(isLoading = true) } }
+                .catch { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "Error loading favorites: ${e.message}"
+                        )
+                    }
+                    e.printStackTrace()
+                }
+                .collect { movies ->
                     _uiState.update {
                         it.copy(
                             movies = movies,
-                            isLoading = false
+                            isLoading = false,
+                            errorMessage = null
                         )
                     }
                 }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = "Error loading favorites: ${e.message}"
-                    )
-                }
-                e.printStackTrace()
-            }
         }
     }
 
@@ -68,7 +66,7 @@ class FavoritesViewModel @Inject constructor(
         when (event) {
             is FavoritesUiEvent.OnMovieClicked -> handleMovieClicked(event.movieId)
             is FavoritesUiEvent.ToggleFavorite -> handleToggleFavorite(event.movie)
-            FavoritesUiEvent.RefreshList -> loadFavorites()
+            FavoritesUiEvent.RefreshList -> { /* No-op, flow is reactive */ }
         }
     }
 
@@ -84,6 +82,7 @@ class FavoritesViewModel @Inject constructor(
                 movieRepository.toggleFavourite(movie.id)
                 val message = "${movie.title} removed from favorites"
                 emitEffect(FavoritesUiEffect.ShowSnackbar(message))
+                // No need to reload - the flow is reactive and will update automatically
             } catch (e: Exception) {
                 emitEffect(FavoritesUiEffect.ShowSnackbar("Error updating favorites"))
                 e.printStackTrace()

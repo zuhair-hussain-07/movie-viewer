@@ -7,7 +7,7 @@ import com.it2161.s243168t.movieviewer.data.remote.dtos.ReviewDto
 
 object MovieMapper {
 
-    fun MovieDto.toMovie(): Movie {
+    fun MovieDto.toMovie(category: String = ""): Movie {
         return Movie(
             id = id,
             adult = adult,
@@ -21,7 +21,8 @@ object MovieMapper {
             voteAverage = voteAverage,
             revenue = revenue ?: 0L,
             posterPath = posterPath ?: "",
-            backdropPath = backdropPath ?: ""
+            backdropPath = backdropPath ?: "",
+            category = category
         )
     }
 

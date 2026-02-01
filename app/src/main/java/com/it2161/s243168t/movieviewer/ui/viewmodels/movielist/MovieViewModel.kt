@@ -120,7 +120,12 @@ class MovieViewModel @Inject constructor(
 
     private fun handleMovieClicked(movieId: Int) {
         viewModelScope.launch {
-            emitEffect(MovieUiEffect.NavigateToDetail(movieId))
+            // Check if online before allowing navigation to details
+            if (_uiState.value.isOnline) {
+                emitEffect(MovieUiEffect.NavigateToDetail(movieId))
+            } else {
+                emitEffect(MovieUiEffect.ShowSnackbar("Cannot view details while offline"))
+            }
         }
     }
 

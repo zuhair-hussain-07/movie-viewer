@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.it2161.s243168t.movieviewer.data.local.models.Movie
 import com.it2161.s243168t.movieviewer.data.repositories.MovieRepository
+import com.it2161.s243168t.movieviewer.utils.NetworkObserver
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FavoritesViewModel @Inject constructor(
-    private val movieRepository: MovieRepository
+    private val movieRepository: MovieRepository,
+    private val networkObserver: NetworkObserver
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FavoritesUiState())
@@ -27,7 +29,16 @@ class FavoritesViewModel @Inject constructor(
     val uiEffect = _uiEffect.asSharedFlow()
 
     init {
+        observeNetworkStatus()
         observeFavorites()
+    }
+
+    private fun observeNetworkStatus() {
+        viewModelScope.launch {
+            networkObserver.isConnected.collect { isConnected ->
+                _uiState.update { it.copy(isOnline = isConnected) }
+            }
+        }
     }
 
     private fun observeFavorites() {
@@ -72,7 +83,12 @@ class FavoritesViewModel @Inject constructor(
 
     private fun handleMovieClicked(movieId: Int) {
         viewModelScope.launch {
-            emitEffect(FavoritesUiEffect.NavigateToDetail(movieId))
+            // Check if online before allowing navigation to details
+            if (_uiState.value.isOnline) {
+                emitEffect(FavoritesUiEffect.NavigateToDetail(movieId))
+            } else {
+                emitEffect(FavoritesUiEffect.ShowSnackbar("Cannot view details while offline"))
+            }
         }
     }
 

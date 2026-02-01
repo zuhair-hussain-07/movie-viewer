@@ -6,5 +6,6 @@ data class FavoritesUiState(
     val movies: List<Movie> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val favoriteIds: Set<Int> = emptySet()
+    val favoriteIds: Set<Int> = emptySet(),
+    val isOnline: Boolean = true
 )

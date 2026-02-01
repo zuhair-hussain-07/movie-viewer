@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Theaters
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -24,15 +23,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.it2161.s243168t.movieviewer.R
 import com.it2161.s243168t.movieviewer.data.local.enums.ButtonType
 import com.it2161.s243168t.movieviewer.data.local.enums.FormFieldType
+import com.it2161.s243168t.movieviewer.data.local.enums.LoadingType
 import com.it2161.s243168t.movieviewer.ui.components.ButtonComponent
 import com.it2161.s243168t.movieviewer.ui.components.FormFieldComponent
+import com.it2161.s243168t.movieviewer.ui.components.LoadingScreen
 import com.it2161.s243168t.movieviewer.ui.navigation.Routes
+import com.it2161.s243168t.movieviewer.ui.theme.Dimens
 import com.it2161.s243168t.movieviewer.ui.viewmodels.authentication.AuthUiEffect
 import com.it2161.s243168t.movieviewer.ui.viewmodels.authentication.AuthUiEvent
 import com.it2161.s243168t.movieviewer.ui.viewmodels.authentication.AuthViewModel
@@ -61,56 +64,59 @@ fun LoginScreen(
             modifier = Modifier
                 .padding(it)
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = Dimens.PaddingScreenHorizontal),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Theaters,
-                contentDescription = "PopCornMovie Logo",
-                modifier = Modifier.size(100.dp),
+                contentDescription = stringResource(R.string.cd_app_logo),
+                modifier = Modifier.size(Dimens.IconSizeHuge),
                 tint = MaterialTheme.colorScheme.primary
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Dimens.SpacingLg))
 
-            Text("Welcome Back", style = MaterialTheme.typography.headlineMedium)
             Text(
-                text = "Login to continue your cinematic journey",
+                text = stringResource(R.string.title_welcome_back),
+                style = MaterialTheme.typography.headlineMedium
+            )
+            Text(
+                text = stringResource(R.string.msg_login_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(Dimens.SpacingXxxl))
 
             FormFieldComponent(
                 value = uiState.userId,
                 onValueChange = { viewModel.onEvent(AuthUiEvent.OnUserIdChanged(it)) },
-                label = "User ID",
+                label = stringResource(R.string.label_user_id),
                 type = FormFieldType.TEXT
             )
 
             FormFieldComponent(
                 value = uiState.password,
                 onValueChange = { viewModel.onEvent(AuthUiEvent.OnPasswordChanged(it)) },
-                label = "Password",
+                label = stringResource(R.string.label_password),
                 type = FormFieldType.PASSWORD,
                 isPasswordVisible = uiState.isPasswordVisible,
                 onPasswordVisibilityToggle = { viewModel.onEvent(AuthUiEvent.TogglePasswordVisibility) }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Dimens.SpacingLg))
 
             if (uiState.isLoading) {
-                CircularProgressIndicator()
+                LoadingScreen(loadingType = LoadingType.SPINNER)
             } else {
                 ButtonComponent(
-                    text = "Login",
+                    text = stringResource(R.string.btn_login),
                     onClick = { viewModel.onEvent(AuthUiEvent.OnLoginClicked) },
                     type = ButtonType.PRIMARY_BUTTON
                 )
             }
 
             TextButton(onClick = { navController.navigate(Routes.Register.route) }) {
-                Text("New here? Create Account")
+                Text(stringResource(R.string.msg_new_here))
             }
         }
     }

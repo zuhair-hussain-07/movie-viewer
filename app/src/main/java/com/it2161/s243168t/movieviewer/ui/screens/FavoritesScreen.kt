@@ -2,38 +2,35 @@ package com.it2161.s243168t.movieviewer.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.SentimentDissatisfied
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.it2161.s243168t.movieviewer.R
+import com.it2161.s243168t.movieviewer.data.local.enums.ErrorType
+import com.it2161.s243168t.movieviewer.data.local.enums.LoadingType
+import com.it2161.s243168t.movieviewer.ui.components.AnimatedListItem
+import com.it2161.s243168t.movieviewer.ui.components.ErrorScreen
+import com.it2161.s243168t.movieviewer.ui.components.LoadingScreen
 import com.it2161.s243168t.movieviewer.ui.components.MovieAppTopAppBar
 import com.it2161.s243168t.movieviewer.ui.components.MovieBottomAppBar
 import com.it2161.s243168t.movieviewer.ui.components.MovieCard
 import com.it2161.s243168t.movieviewer.ui.navigation.Routes
+import com.it2161.s243168t.movieviewer.ui.theme.Dimens
 import com.it2161.s243168t.movieviewer.ui.viewmodels.favorites.FavoritesUiEffect
 import com.it2161.s243168t.movieviewer.ui.viewmodels.favorites.FavoritesUiEvent
 import com.it2161.s243168t.movieviewer.ui.viewmodels.favorites.FavoritesViewModel
@@ -63,7 +60,7 @@ fun FavoritesScreen(
     Scaffold(
         topBar = {
             MovieAppTopAppBar(
-                title = "My Favorites",
+                title = stringResource(R.string.title_my_favorites),
                 canNavigateBack = false,
                 onNavigateBack = {}
             )
@@ -89,86 +86,43 @@ fun FavoritesScreen(
         ) {
             when {
                 uiState.isLoading -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center)
-                    )
+                    LoadingScreen(loadingType = LoadingType.SKELETON_LIST, itemCount = 3)
                 }
                 uiState.errorMessage != null -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.SentimentDissatisfied,
-                            contentDescription = "Error",
-                            modifier = Modifier.size(64.dp),
-                            tint = MaterialTheme.colorScheme.error
-                        )
-                        Text(
-                            text = uiState.errorMessage ?: "An error occurred",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.error,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(top = 16.dp)
-                        )
-                    }
+                    ErrorScreen(
+                        errorType = ErrorType.GENERIC,
+                        message = uiState.errorMessage
+                    )
                 }
                 uiState.movies.isEmpty() -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.SentimentDissatisfied,
-                            contentDescription = "No favorites",
-                            modifier = Modifier.size(64.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            text = "No favorites yet",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.padding(top = 16.dp)
-                        )
-                        Text(
-                            text = "Start adding movies to your favorites by tapping the heart icon on any movie card.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
-                    }
+                    ErrorScreen(errorType = ErrorType.EMPTY_FAVORITES)
                 }
                 else -> {
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(1),
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        contentPadding = PaddingValues(vertical = 16.dp)
+                            .padding(horizontal = Dimens.PaddingScreenHorizontal),
+                        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingLg),
+                        horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingLg),
+                        contentPadding = PaddingValues(vertical = Dimens.PaddingScreenVertical)
                     ) {
-                        items(
+                        itemsIndexed(
                             items = uiState.movies,
-                            key = { movie -> movie.id }
-                        ) { movie ->
-                            MovieCard(
-                                movie = movie,
-                                onClick = {
-                                    viewModel.onEvent(FavoritesUiEvent.OnMovieClicked(movie.id))
-                                },
-                                isFavorite = movie.id in uiState.favoriteIds,
-                                onToggleFavorite = {
-                                    viewModel.onEvent(FavoritesUiEvent.ToggleFavorite(movie))
-                                }
-                            )
+                            key = { _, movie -> movie.id }
+                        ) { index, movie ->
+                            AnimatedListItem(index = index) {
+                                MovieCard(
+                                    movie = movie,
+                                    onClick = {
+                                        viewModel.onEvent(FavoritesUiEvent.OnMovieClicked(movie.id))
+                                    },
+                                    isFavorite = movie.id in uiState.favoriteIds,
+                                    onToggleFavorite = {
+                                        viewModel.onEvent(FavoritesUiEvent.ToggleFavorite(movie))
+                                    }
+                                )
+                            }
                         }
                     }
                 }

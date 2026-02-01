@@ -1,6 +1,5 @@
 package com.it2161.s243168t.movieviewer.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,15 +20,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.HowToVote
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,27 +40,34 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
-import com.it2161.s243168t.movieviewer.data.local.enums.ButtonType
-import com.it2161.s243168t.movieviewer.ui.components.ButtonComponent
+import coil.compose.SubcomposeAsyncImage
+import coil.request.ImageRequest
+import com.it2161.s243168t.movieviewer.R
+import com.it2161.s243168t.movieviewer.data.local.enums.ErrorType
+import com.it2161.s243168t.movieviewer.data.local.enums.LoadingType
+import com.it2161.s243168t.movieviewer.ui.components.AnimatedFadeIn
+import com.it2161.s243168t.movieviewer.ui.components.AnimatedFavoriteButton
 import com.it2161.s243168t.movieviewer.ui.components.CardComponent
 import com.it2161.s243168t.movieviewer.ui.components.DetailRowComponent
+import com.it2161.s243168t.movieviewer.ui.components.ErrorScreen
 import com.it2161.s243168t.movieviewer.ui.components.GenreChipComponent
+import com.it2161.s243168t.movieviewer.ui.components.LoadingScreen
 import com.it2161.s243168t.movieviewer.ui.components.MovieAppTopAppBar
+import com.it2161.s243168t.movieviewer.ui.components.RatingBadge
 import com.it2161.s243168t.movieviewer.ui.components.ReviewItemComponent
+import com.it2161.s243168t.movieviewer.ui.components.ShimmerBox
+import com.it2161.s243168t.movieviewer.ui.theme.Dimens
+import com.it2161.s243168t.movieviewer.ui.viewmodels.moviedetail.MovieDetailUiEffect
 import com.it2161.s243168t.movieviewer.ui.viewmodels.moviedetail.MovieDetailUiEvent
 import com.it2161.s243168t.movieviewer.ui.viewmodels.moviedetail.MovieDetailViewModel
 import com.it2161.s243168t.movieviewer.utils.formatRevenue
 import com.it2161.s243168t.movieviewer.utils.formatRuntime
 import java.text.NumberFormat
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.remember
-import com.it2161.s243168t.movieviewer.ui.viewmodels.moviedetail.MovieDetailUiEffect
 import java.util.Locale
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -84,7 +89,7 @@ fun MovieDetailScreen(navController: NavController, movieId: Int) {
     Scaffold(
         topBar = {
             MovieAppTopAppBar(
-                title = "Movie Details",
+                title = stringResource(R.string.title_movie_details),
                 canNavigateBack = true,
                 onNavigateBack = { navController.popBackStack() }
             )
@@ -99,30 +104,17 @@ fun MovieDetailScreen(navController: NavController, movieId: Int) {
         ) {
             // Loading state
             if (uiState.isLoading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
+                LoadingScreen(loadingType = LoadingType.SKELETON_DETAIL)
                 return@Scaffold
             }
 
             // Error state
             if (uiState.errorMessage != null) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Error: ${uiState.errorMessage}",
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
+                ErrorScreen(
+                    errorType = ErrorType.GENERIC,
+                    message = uiState.errorMessage
+                )
+                return@Scaffold
             }
 
             // Movie details
@@ -134,15 +126,20 @@ fun MovieDetailScreen(navController: NavController, movieId: Int) {
                         .fillMaxWidth()
                         .aspectRatio(16f / 9f)
                 ) {
-                    // Backdrop image
+                    // Backdrop image with crossfade
                     if (movie.backdropPath.isNotEmpty()) {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                "https://image.tmdb.org/t/p/w780${movie.backdropPath}"
-                            ),
+                        SubcomposeAsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data("https://image.tmdb.org/t/p/w780${movie.backdropPath}")
+                                .crossfade(true)
+                                .crossfade(300)
+                                .build(),
                             contentDescription = movie.title,
                             modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
+                            contentScale = ContentScale.Crop,
+                            loading = {
+                                ShimmerBox(modifier = Modifier.fillMaxSize())
+                            }
                         )
                     } else {
                         Box(
@@ -171,7 +168,7 @@ fun MovieDetailScreen(navController: NavController, movieId: Int) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .align(Alignment.BottomStart)
-                            .padding(16.dp),
+                            .padding(Dimens.SpacingLg),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.Bottom
                     ) {
@@ -184,83 +181,72 @@ fun MovieDetailScreen(navController: NavController, movieId: Int) {
                             modifier = Modifier.weight(1f)
                         )
 
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(Dimens.SpacingSm))
 
                         // Rating and Favorite button
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingSm)
                         ) {
                             // Rating badge
-                            Row(
-                                modifier = Modifier
-                                    .background(
-                                        MaterialTheme.colorScheme.primary,
-                                        RoundedCornerShape(8.dp)
-                                    )
-                                    .padding(horizontal = 8.dp, vertical = 4.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "⭐ ${String.format(Locale.US, "%.1f", movie.voteAverage)}",
-                                    style = MaterialTheme.typography.labelLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onPrimary
-                                )
-                            }
+                            RatingBadge(rating = movie.voteAverage)
 
                             // Favorite button
-                            ButtonComponent(
-                                text = "",
-                                onClick = { viewModel.onEvent(MovieDetailUiEvent.ToggleFavorite(movie.id)) },
-                                type = ButtonType.ICON_TEXT,
-                                isSelected = uiState.isFavorite,
-                                icon = if (uiState.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                                iconContentDescription = if (uiState.isFavorite) "Remove from favorites" else "Add to favorites",
-                                modifier = Modifier.width(56.dp)
+                            AnimatedFavoriteButton(
+                                isFavorite = uiState.isFavorite,
+                                onToggle = { viewModel.onEvent(MovieDetailUiEvent.ToggleFavorite(movie.id)) }
                             )
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(Dimens.SpacingLg))
 
                 // Genres (above the details card)
                 if (movie.genres.isNotEmpty()) {
                     FlowRow(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier.padding(horizontal = Dimens.PaddingScreenHorizontal),
+                        horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingSm),
+                        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingSm)
                     ) {
                         movie.genres.forEach { genre ->
                             GenreChipComponent(genre = genre)
                         }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(Dimens.SpacingLg))
                 }
 
                 // Movie info card with poster and details
-                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                Box(modifier = Modifier.padding(horizontal = Dimens.PaddingScreenHorizontal)) {
                     CardComponent {
                         Row(
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            // Poster image
+                            // Poster image with crossfade
                             if (movie.posterPath.isNotEmpty()) {
-                                Image(
-                                    painter = rememberAsyncImagePainter(
-                                        "https://image.tmdb.org/t/p/w342${movie.posterPath}"
-                                    ),
-                                    contentDescription = "${movie.title} poster",
+                                SubcomposeAsyncImage(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data("https://image.tmdb.org/t/p/w342${movie.posterPath}")
+                                        .crossfade(true)
+                                        .crossfade(300)
+                                        .build(),
+                                    contentDescription = stringResource(R.string.cd_movie_poster, movie.title),
                                     modifier = Modifier
-                                        .width(120.dp)
+                                        .width(Dimens.PosterWidth)
                                         .aspectRatio(2f / 3f)
-                                        .clip(RoundedCornerShape(8.dp)),
-                                    contentScale = ContentScale.Crop
+                                        .clip(RoundedCornerShape(Dimens.CornerRadiusMd)),
+                                    contentScale = ContentScale.Crop,
+                                    loading = {
+                                        ShimmerBox(
+                                            modifier = Modifier
+                                                .width(Dimens.PosterWidth)
+                                                .aspectRatio(2f / 3f)
+                                        )
+                                    }
                                 )
                             }
 
-                            Spacer(modifier = Modifier.width(16.dp))
+                            Spacer(modifier = Modifier.width(Dimens.SpacingLg))
 
                             // Details column
                             Column(
@@ -268,50 +254,50 @@ fun MovieDetailScreen(navController: NavController, movieId: Int) {
                             ) {
                                 DetailRowComponent(
                                     icon = Icons.Default.CalendarToday,
-                                    label = "Release",
+                                    label = stringResource(R.string.label_release),
                                     value = movie.releaseDate
                                 )
                                 DetailRowComponent(
                                     icon = Icons.Default.Timer,
-                                    label = "Runtime",
-                                    value = "${formatRuntime(movie.runtime)}"
+                                    label = stringResource(R.string.label_runtime),
+                                    value = formatRuntime(movie.runtime)
                                 )
                                 DetailRowComponent(
                                     icon = Icons.Default.Star,
-                                    label = "Rating",
-                                    value = "${String.format(Locale.US, "%.1f", movie.voteAverage)}/10"
+                                    label = stringResource(R.string.label_rating),
+                                    value = stringResource(R.string.format_rating_out_of_ten, String.format(Locale.US, "%.1f", movie.voteAverage))
                                 )
                                 DetailRowComponent(
                                     icon = Icons.Default.HowToVote,
-                                    label = "Votes",
+                                    label = stringResource(R.string.label_votes),
                                     value = NumberFormat.getNumberInstance(Locale.US).format(movie.voteCount)
                                 )
                                 DetailRowComponent(
                                     icon = Icons.Default.Language,
-                                    label = "Language",
+                                    label = stringResource(R.string.label_language),
                                     value = movie.originalLanguage.uppercase()
                                 )
                                 DetailRowComponent(
                                     icon = Icons.Default.AttachMoney,
-                                    label = "Revenue",
-                                    value = "${formatRevenue(movie.revenue)}"
+                                    label = stringResource(R.string.label_revenue),
+                                    value = formatRevenue(movie.revenue)
                                 )
                             }
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(Dimens.SpacingLg))
 
                 // Overview card
-                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                Box(modifier = Modifier.padding(horizontal = Dimens.PaddingScreenHorizontal)) {
                     CardComponent {
                         Column {
                             Text(
-                                text = "Overview",
+                                text = stringResource(R.string.label_overview),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(bottom = 8.dp)
+                                modifier = Modifier.padding(bottom = Dimens.SpacingSm)
                             )
                             Text(
                                 text = movie.overview,
@@ -322,41 +308,39 @@ fun MovieDetailScreen(navController: NavController, movieId: Int) {
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(Dimens.SpacingLg))
 
-                // Reviews section
-                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                // Reviews section with animations
+                Column(modifier = Modifier.padding(horizontal = Dimens.PaddingScreenHorizontal)) {
                     Text(
-                        text = "Reviews",
+                        text = stringResource(R.string.label_reviews),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = Dimens.SpacingSm)
                     )
 
                     if (uiState.reviews.isEmpty()) {
                         Text(
-                            text = "No reviews available",
+                            text = stringResource(R.string.msg_no_reviews_available),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     } else {
-                        uiState.reviews.forEach { review ->
-                            ReviewItemComponent(review = review)
-                            Spacer(modifier = Modifier.height(12.dp))
+                        uiState.reviews.forEachIndexed { index, review ->
+                            AnimatedFadeIn(index = index) {
+                                ReviewItemComponent(review = review)
+                            }
+                            Spacer(modifier = Modifier.height(Dimens.SpacingMd))
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(Dimens.SpacingLg))
             } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("No movie data available")
-                }
+                ErrorScreen(
+                    errorType = ErrorType.NO_DATA,
+                    title = stringResource(R.string.msg_no_movie_data)
+                )
             }
         }
     }

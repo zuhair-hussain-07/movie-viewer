@@ -1,7 +1,6 @@
 package com.it2161.s243168t.movieviewer.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,34 +8,37 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.it2161.s243168t.movieviewer.R
 import com.it2161.s243168t.movieviewer.data.local.enums.ButtonType
+import com.it2161.s243168t.movieviewer.data.local.enums.ErrorType
+import com.it2161.s243168t.movieviewer.data.local.enums.LoadingType
+import com.it2161.s243168t.movieviewer.ui.components.AnimatedListItem
 import com.it2161.s243168t.movieviewer.ui.components.ButtonComponent
+import com.it2161.s243168t.movieviewer.ui.components.ErrorScreen
+import com.it2161.s243168t.movieviewer.ui.components.LoadingScreen
 import com.it2161.s243168t.movieviewer.ui.components.MovieAppTopAppBar
 import com.it2161.s243168t.movieviewer.ui.components.MovieBottomAppBar
 import com.it2161.s243168t.movieviewer.ui.components.MovieCard
 import com.it2161.s243168t.movieviewer.ui.components.SearchBarComponent
 import com.it2161.s243168t.movieviewer.ui.navigation.Routes
+import com.it2161.s243168t.movieviewer.ui.theme.Dimens
 import com.it2161.s243168t.movieviewer.ui.viewmodels.movielist.MovieUiEffect
 import com.it2161.s243168t.movieviewer.ui.viewmodels.movielist.MovieUiEvent
 import com.it2161.s243168t.movieviewer.ui.viewmodels.movielist.MovieViewModel
@@ -63,20 +65,25 @@ fun MovieListScreen(
         }
     }
 
-    val categories = listOf("Popular", "Top Rated", "Now Playing", "Upcoming")
+    val categories = listOf(
+        stringResource(R.string.category_popular),
+        stringResource(R.string.category_top_rated),
+        stringResource(R.string.category_now_playing),
+        stringResource(R.string.category_upcoming)
+    )
     val categoryRoutes = listOf("popular", "top_rated", "now_playing", "upcoming")
 
     Scaffold(
         topBar = {
             MovieAppTopAppBar(
-                title = "Discover Movies",
+                title = stringResource(R.string.title_discover_movies),
                 canNavigateBack = false,
                 onNavigateBack = {}
             ) {
                 IconButton(onClick = { }) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = "More options"
+                        contentDescription = stringResource(R.string.cd_more_options)
                     )
                 }
             }
@@ -109,15 +116,15 @@ fun MovieListScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp)
+                    .padding(horizontal = Dimens.PaddingScreenHorizontal, vertical = Dimens.SpacingXs)
             )
 
             // Category Selection (LazyRow)
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    .padding(horizontal = Dimens.PaddingScreenHorizontal, vertical = Dimens.SpacingXs),
+                horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingSm)
             ) {
                 items(categories.size) { index ->
                     ButtonComponent(
@@ -129,7 +136,7 @@ fun MovieListScreen(
                         },
                         type = ButtonType.SELECTABLE_BUTTON,
                         isSelected = uiState.selectedCategory == categoryRoutes[index],
-                        modifier = Modifier.padding(vertical = 0.dp)
+                        modifier = Modifier.padding(vertical = Dimens.SpacingXxs)
                     )
                 }
             }
@@ -137,97 +144,47 @@ fun MovieListScreen(
             // Movie Feed
             when {
                 uiState.isLoading -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
+                    LoadingScreen(
+                        loadingType = LoadingType.SKELETON_LIST,
+                        itemCount = 3
+                    )
                 }
                 uiState.movies.isEmpty() && !uiState.isOnline -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = "No cached data available",
-                                style = MaterialTheme.typography.headlineSmall,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Text(
-                                text = "You appear to be offline. Please connect to the internet to load movies.",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(top = 8.dp)
-                            )
-                            ButtonComponent(
-                                text = "Retry",
-                                onClick = {
-                                    viewModel.onEvent(MovieUiEvent.RefreshList)
-                                },
-                                type = ButtonType.PRIMARY_BUTTON,
-                                modifier = Modifier.padding(top = 16.dp)
-                            )
-                        }
-                    }
+                    ErrorScreen(
+                        errorType = ErrorType.NO_INTERNET,
+                        onRetry = { viewModel.onEvent(MovieUiEvent.RefreshList) }
+                    )
                 }
                 uiState.movies.isEmpty() -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = "No movies found",
-                                style = MaterialTheme.typography.headlineSmall,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            ButtonComponent(
-                                text = "Retry",
-                                onClick = {
-                                    viewModel.onEvent(MovieUiEvent.RefreshList)
-                                },
-                                type = ButtonType.PRIMARY_BUTTON,
-                                modifier = Modifier.padding(top = 16.dp)
-                            )
-                        }
-                    }
+                    ErrorScreen(
+                        errorType = ErrorType.NO_DATA,
+                        onRetry = { viewModel.onEvent(MovieUiEvent.RefreshList) }
+                    )
                 }
                 else -> {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        contentPadding = PaddingValues(vertical = 16.dp)
+                            .padding(horizontal = Dimens.PaddingScreenHorizontal),
+                        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingLg),
+                        contentPadding = PaddingValues(vertical = Dimens.PaddingScreenVertical)
                     ) {
-                        items(
+                        itemsIndexed(
                             items = uiState.movies,
-                            key = { movie -> movie.id }
-                        ) { movie ->
-                            MovieCard(
-                                movie = movie,
-                                onClick = {
-                                    viewModel.onEvent(MovieUiEvent.OnMovieClicked(movie.id))
-                                },
-                                isFavorite = movie.id in uiState.favoriteIds,
-                                onToggleFavorite = {
-                                    viewModel.onEvent(MovieUiEvent.ToggleFavorite(movie))
-                                }
-                            )
+                            key = { _, movie -> movie.id }
+                        ) { index, movie ->
+                            AnimatedListItem(index = index) {
+                                MovieCard(
+                                    movie = movie,
+                                    onClick = {
+                                        viewModel.onEvent(MovieUiEvent.OnMovieClicked(movie.id))
+                                    },
+                                    isFavorite = movie.id in uiState.favoriteIds,
+                                    onToggleFavorite = {
+                                        viewModel.onEvent(MovieUiEvent.ToggleFavorite(movie))
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -235,4 +192,3 @@ fun MovieListScreen(
         }
     }
 }
-

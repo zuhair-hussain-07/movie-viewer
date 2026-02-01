@@ -1,3 +1,98 @@
 <resources>
     <string name="app_name">243168T Movie Viewer</string>
+
+    <!-- Navigation & Titles -->
+    <string name="title_discover_movies">Discover Movies</string>
+    <string name="title_movie_details">Movie Details</string>
+    <string name="title_my_favorites">My Favorites</string>
+    <string name="title_my_profile">My Profile</string>
+    <string name="title_edit_profile">Edit Profile</string>
+    <string name="title_create_account">Create Account</string>
+    <string name="title_welcome_back">Welcome Back</string>
+    <string name="title_sign_out">Sign Out</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_favorites">Favorites</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Categories -->
+    <string name="category_popular">Popular</string>
+    <string name="category_top_rated">Top Rated</string>
+    <string name="category_now_playing">Now Playing</string>
+    <string name="category_upcoming">Upcoming</string>
+
+    <!-- Movie Details Labels -->
+    <string name="label_release">Release</string>
+    <string name="label_runtime">Runtime</string>
+    <string name="label_rating">Rating</string>
+    <string name="label_votes">Votes</string>
+    <string name="label_language">Language</string>
+    <string name="label_revenue">Revenue</string>
+    <string name="label_overview">Overview</string>
+    <string name="label_reviews">Reviews</string>
+    <string name="label_release_date">Release: %s</string>
+
+    <!-- Form Labels -->
+    <string name="label_user_id">User ID</string>
+    <string name="label_preferred_name">Preferred Name</string>
+    <string name="label_date_of_birth">Date of Birth</string>
+    <string name="label_password">Password</string>
+    <string name="label_new_password">New Password</string>
+    <string name="label_confirm_password">Confirm Password</string>
+    <string name="label_confirm_new_password">Confirm New Password</string>
+    <string name="label_search_movies">Search movies…</string>
+
+    <!-- Buttons -->
+    <string name="btn_login">Login</string>
+    <string name="btn_register">Register Now</string>
+    <string name="btn_retry">Retry</string>
+    <string name="btn_edit_profile">Edit Profile</string>
+    <string name="btn_save_changes">Save Changes</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="btn_sign_out">Sign Out</string>
+    <string name="btn_back_to_home">Back to Home</string>
+    <string name="btn_ok">OK</string>
+
+    <!-- Messages -->
+    <string name="msg_login_subtitle">Login to continue your cinematic journey</string>
+    <string name="msg_no_cached_data">No cached data available</string>
+    <string name="msg_offline_description">You appear to be offline. Please connect to the internet to load movies.</string>
+    <string name="msg_no_movies_found">No movies found</string>
+    <string name="msg_no_favorites_yet">No favorites yet</string>
+    <string name="msg_add_favorites_hint">Start adding movies to your favorites by tapping the heart icon on any movie card.</string>
+    <string name="msg_no_reviews_available">No reviews available</string>
+    <string name="msg_no_movie_data">No movie data available</string>
+    <string name="msg_unable_to_load_profile">Unable to load profile</string>
+    <string name="msg_login_again">Please log in again to access your profile</string>
+    <string name="msg_sign_out_confirmation">Are you sure you want to sign out?</string>
+    <string name="msg_already_member">Already a member? Log In</string>
+    <string name="msg_new_here">New here? Create Account</string>
+
+    <!-- Error Messages -->
+    <string name="error_generic">An error occurred</string>
+    <string name="error_no_internet">No internet connection</string>
+    <string name="error_loading_failed">Failed to load data</string>
+    <string name="error_prefix">Error: %s</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_back">Back</string>
+    <string name="cd_more_options">More options</string>
+    <string name="cd_add_to_favorites">Add to favorites</string>
+    <string name="cd_remove_from_favorites">Remove from favorites</string>
+    <string name="cd_toggle_password">Toggle password visibility</string>
+    <string name="cd_select_date">Select date</string>
+    <string name="cd_take_photo">Take photo</string>
+    <string name="cd_profile_picture">Profile Picture</string>
+    <string name="cd_no_profile_picture">No Profile Picture</string>
+    <string name="cd_change_profile_picture">Change Profile Picture</string>
+    <string name="cd_app_logo">PopCornMovie Logo</string>
+    <string name="cd_error_icon">Error</string>
+    <string name="cd_no_favorites_icon">No favorites</string>
+    <string name="cd_author_avatar">Author avatar</string>
+    <string name="cd_movie_poster">%s poster</string>
+
+    <!-- Formats -->
+    <string name="format_rating">⭐ %s</string>
+    <string name="format_rating_out_of_ten">%s/10</string>
 </resources>

@@ -9,13 +9,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -32,20 +30,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.it2161.s243168t.movieviewer.R
 import com.it2161.s243168t.movieviewer.data.local.enums.ButtonType
+import com.it2161.s243168t.movieviewer.data.local.enums.ErrorType
 import com.it2161.s243168t.movieviewer.data.local.enums.FormFieldType
+import com.it2161.s243168t.movieviewer.data.local.enums.LoadingType
 import com.it2161.s243168t.movieviewer.ui.components.ButtonComponent
 import com.it2161.s243168t.movieviewer.ui.components.CardComponent
 import com.it2161.s243168t.movieviewer.ui.components.ConfirmationDialog
+import com.it2161.s243168t.movieviewer.ui.components.ErrorScreen
 import com.it2161.s243168t.movieviewer.ui.components.FormFieldComponent
+import com.it2161.s243168t.movieviewer.ui.components.LoadingScreen
 import com.it2161.s243168t.movieviewer.ui.components.MovieAppTopAppBar
 import com.it2161.s243168t.movieviewer.ui.components.MovieBottomAppBar
 import com.it2161.s243168t.movieviewer.ui.components.ProfileDetailRow
 import com.it2161.s243168t.movieviewer.ui.components.ProfilePictureComponent
 import com.it2161.s243168t.movieviewer.ui.navigation.Routes
+import com.it2161.s243168t.movieviewer.ui.theme.Dimens
 import com.it2161.s243168t.movieviewer.ui.viewmodels.profile.ProfileUiEffect
 import com.it2161.s243168t.movieviewer.ui.viewmodels.profile.ProfileUiEvent
 import com.it2161.s243168t.movieviewer.ui.viewmodels.profile.ProfileViewModel
@@ -82,15 +86,15 @@ fun ProfileScreen(
     Scaffold(
         topBar = {
             MovieAppTopAppBar(
-                title = if (uiState.isEditMode) "Edit Profile" else "My Profile",
+                title = if (uiState.isEditMode) stringResource(R.string.title_edit_profile) else stringResource(R.string.title_my_profile),
                 canNavigateBack = uiState.isEditMode,
                 onNavigateBack = { viewModel.onEvent(ProfileUiEvent.OnEditToggle) }
             ) {
                 if (!uiState.isEditMode) {
                     IconButton(onClick = { showSignOutDialog = true }) {
-                        androidx.compose.material3.Icon(
-                            imageVector = Icons.Default.ExitToApp,
-                            contentDescription = "Sign Out"
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                            contentDescription = stringResource(R.string.btn_sign_out)
                         )
                     }
                 }
@@ -115,45 +119,32 @@ fun ProfileScreen(
             modifier = Modifier
                 .padding(it)
                 .fillMaxSize()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = Dimens.PaddingScreenHorizontal)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             if (uiState.isLoading) {
-                CircularProgressIndicator()
+                LoadingScreen(loadingType = LoadingType.SPINNER)
             } else if (uiState.user == null) {
                 // Handle null user case - show error and redirect
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
-                    Text(
-                        text = "Unable to load profile",
-                        style = androidx.compose.material3.MaterialTheme.typography.headlineSmall,
-                        color = androidx.compose.material3.MaterialTheme.colorScheme.error
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Please log in again to access your profile",
-                        style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-                        color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    ButtonComponent(
-                        text = "Back to Home",
-                        onClick = { navController.navigate(Routes.MovieList.route) },
-                        type = ButtonType.PRIMARY_BUTTON
-                    )
-                    ButtonComponent(
-                        text = "Sign Out",
-                        onClick = { navController.navigate(Routes.Login.route) { popUpTo(Routes.MovieList.route) { inclusive = true } } },
-                        type = ButtonType.SECONDARY_BUTTON
-                    )
-                }
+                ErrorScreen(
+                    errorType = ErrorType.GENERIC,
+                    title = stringResource(R.string.msg_unable_to_load_profile),
+                    message = stringResource(R.string.msg_login_again),
+                    onRetry = null
+                )
+                Spacer(modifier = Modifier.height(Dimens.SpacingLg))
+                ButtonComponent(
+                    text = stringResource(R.string.btn_back_to_home),
+                    onClick = { navController.navigate(Routes.MovieList.route) },
+                    type = ButtonType.PRIMARY_BUTTON
+                )
+                ButtonComponent(
+                    text = stringResource(R.string.btn_sign_out),
+                    onClick = { navController.navigate(Routes.Login.route) { popUpTo(Routes.MovieList.route) { inclusive = true } } },
+                    type = ButtonType.SECONDARY_BUTTON
+                )
             } else {
                 uiState.user?.let { user ->
                     if (uiState.isEditMode) {
@@ -166,26 +157,26 @@ fun ProfileScreen(
                         FormFieldComponent(
                             value = uiState.userId,
                             onValueChange = { viewModel.onEvent(ProfileUiEvent.OnUserIdChanged(it)) },
-                            label = "User Id",
+                            label = stringResource(R.string.label_user_id),
                             type = FormFieldType.TEXT
                         )
                         FormFieldComponent(
                             value = uiState.preferredName,
                             onValueChange = { viewModel.onEvent(ProfileUiEvent.OnNameChanged(it)) },
-                            label = "Preferred Name",
+                            label = stringResource(R.string.label_preferred_name),
                             type = FormFieldType.TEXT
                         )
                         FormFieldComponent(
                             value = uiState.dob,
                             onValueChange = {},
-                            label = "Date of Birth",
+                            label = stringResource(R.string.label_date_of_birth),
                             type = FormFieldType.DATE,
                             onTrailingIconClick = { showDatePicker = true }
                         )
                         FormFieldComponent(
                             value = uiState.newPassword,
                             onValueChange = { viewModel.onEvent(ProfileUiEvent.OnNewPasswordChanged(it)) },
-                            label = "New Password",
+                            label = stringResource(R.string.label_new_password),
                             type = FormFieldType.PASSWORD,
                             isPasswordVisible = uiState.isPasswordVisible,
                             onPasswordVisibilityToggle = { viewModel.onEvent(ProfileUiEvent.TogglePasswordVisibility) }
@@ -193,39 +184,39 @@ fun ProfileScreen(
                         FormFieldComponent(
                             value = uiState.confirmNewPassword,
                             onValueChange = { viewModel.onEvent(ProfileUiEvent.OnConfirmNewPasswordChanged(it)) },
-                            label = "Confirm New Password",
+                            label = stringResource(R.string.label_confirm_new_password),
                             type = FormFieldType.PASSWORD,
                             isPasswordVisible = uiState.isConfirmPasswordVisible,
                             onPasswordVisibilityToggle = { viewModel.onEvent(ProfileUiEvent.ToggleConfirmPasswordVisibility) }
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(Dimens.SpacingLg))
                         ButtonComponent(
-                            text = "Save Changes",
+                            text = stringResource(R.string.btn_save_changes),
                             onClick = { viewModel.onEvent(ProfileUiEvent.OnSaveClicked) },
                             type = ButtonType.PRIMARY_BUTTON
                         )
                         ButtonComponent(
-                            text = "Cancel",
+                            text = stringResource(R.string.btn_cancel),
                             onClick = { viewModel.onEvent(ProfileUiEvent.OnEditToggle) },
                             type = ButtonType.SECONDARY_BUTTON
                         )
                     } else {
                         // View Mode
                         ProfilePictureComponent(uri = user.profilePicture, isEditing = false)
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(Dimens.SpacingSm))
                         CardComponent {
-                            ProfileDetailRow(label = "User ID", value = user.userId)
-                            ProfileDetailRow(label = "Preferred Name", value = user.preferredName)
-                            ProfileDetailRow(label = "Date of Birth", value = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(user.dateOfBirth))
+                            ProfileDetailRow(label = stringResource(R.string.label_user_id), value = user.userId)
+                            ProfileDetailRow(label = stringResource(R.string.label_preferred_name), value = user.preferredName)
+                            ProfileDetailRow(label = stringResource(R.string.label_date_of_birth), value = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(user.dateOfBirth))
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(Dimens.SpacingLg))
                         ButtonComponent(
-                            text = "Edit Profile",
+                            text = stringResource(R.string.btn_edit_profile),
                             onClick = { viewModel.onEvent(ProfileUiEvent.OnEditToggle) },
                             type = ButtonType.PRIMARY_BUTTON
                         )
                         ButtonComponent(
-                            text = "Sign Out",
+                            text = stringResource(R.string.btn_sign_out),
                             onClick = { showSignOutDialog = true },
                             type = ButtonType.SECONDARY_BUTTON
                         )
@@ -239,14 +230,13 @@ fun ProfileScreen(
         ConfirmationDialog(
             onConfirm = {
                 showSignOutDialog = false
-                // TODO: viewModel.onEvent(ProfileUiEvent.OnLogout)
                 navController.navigate(Routes.Login.route) {
                     popUpTo(Routes.MovieList.route) { inclusive = true }
                 }
             },
             onDismiss = { showSignOutDialog = false },
-            title = "Sign Out",
-            text = "Are you sure you want to sign out?"
+            title = stringResource(R.string.title_sign_out),
+            text = stringResource(R.string.msg_sign_out_confirmation)
         )
     }
 
@@ -262,12 +252,12 @@ fun ProfileScreen(
                         viewModel.onEvent(ProfileUiEvent.OnDobChanged(sdf.format(Date(it))))
                     }
                 }) {
-                    androidx.compose.material3.Text("OK")
+                    Text(stringResource(R.string.btn_ok))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) {
-                    androidx.compose.material3.Text("Cancel")
+                    Text(stringResource(R.string.btn_cancel))
                 }
             }
         ) {

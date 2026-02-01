@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Grid System: Consistent spacing based on 4dp multiples -->
+    <!-- Base spacing units -->
+    <dimen name="spacing_xxs">2dp</dimen>
+    <dimen name="spacing_xs">4dp</dimen>
+    <dimen name="spacing_sm">8dp</dimen>
+    <dimen name="spacing_md">12dp</dimen>
+    <dimen name="spacing_lg">16dp</dimen>
+    <dimen name="spacing_xl">20dp</dimen>
+    <dimen name="spacing_xxl">24dp</dimen>
+    <dimen name="spacing_xxxl">32dp</dimen>
+    <dimen name="spacing_huge">48dp</dimen>
+
+    <!-- Padding values -->
+    <dimen name="padding_screen_horizontal">16dp</dimen>
+    <dimen name="padding_screen_vertical">16dp</dimen>
+    <dimen name="padding_card">16dp</dimen>
+    <dimen name="padding_chip_horizontal">12dp</dimen>
+    <dimen name="padding_chip_vertical">6dp</dimen>
+    <dimen name="padding_button_vertical">4dp</dimen>
+    <dimen name="padding_form_field_vertical">8dp</dimen>
+    <dimen name="padding_badge">8dp</dimen>
+    <dimen name="padding_badge_inner">4dp</dimen>
+
+    <!-- Corner Radii -->
+    <dimen name="corner_radius_sm">4dp</dimen>
+    <dimen name="corner_radius_md">8dp</dimen>
+    <dimen name="corner_radius_lg">12dp</dimen>
+    <dimen name="corner_radius_xl">16dp</dimen>
+    <dimen name="corner_radius_round">50dp</dimen>
+
+    <!-- Icon Sizes -->
+    <dimen name="icon_size_xs">16dp</dimen>
+    <dimen name="icon_size_sm">20dp</dimen>
+    <dimen name="icon_size_md">24dp</dimen>
+    <dimen name="icon_size_lg">32dp</dimen>
+    <dimen name="icon_size_xl">48dp</dimen>
+    <dimen name="icon_size_xxl">64dp</dimen>
+    <dimen name="icon_size_huge">100dp</dimen>
+
+    <!-- Image Heights -->
+    <dimen name="movie_card_image_height">200dp</dimen>
+    <dimen name="movie_detail_backdrop_height">200dp</dimen>
+    <dimen name="poster_width">120dp</dimen>
+
+    <!-- Profile Picture -->
+    <dimen name="profile_picture_size">160dp</dimen>
+    <dimen name="profile_picture_border">4dp</dimen>
+    <dimen name="profile_picture_fab_size">40dp</dimen>
+    <dimen name="profile_picture_fab_icon">20dp</dimen>
+    <dimen name="profile_picture_fab_offset">-8dp</dimen>
+
+    <!-- Card Elevation -->
+    <dimen name="elevation_sm">2dp</dimen>
+    <dimen name="elevation_md">4dp</dimen>
+    <dimen name="elevation_lg">8dp</dimen>
+
+    <!-- Avatar Size -->
+    <dimen name="avatar_size_sm">32dp</dimen>
+    <dimen name="avatar_size_md">40dp</dimen>
+    <dimen name="avatar_size_lg">56dp</dimen>
+
+    <!-- Bottom Navigation -->
+    <dimen name="bottom_nav_height">80dp</dimen>
+
+    <!-- Skeleton/Shimmer -->
+    <dimen name="skeleton_card_height">280dp</dimen>
+
+    <!-- Text Sizes (sp) - complementing Type.kt -->
+    <dimen name="text_size_xs">11sp</dimen>
+    <dimen name="text_size_sm">12sp</dimen>
+    <dimen name="text_size_md">14sp</dimen>
+    <dimen name="text_size_body">16sp</dimen>
+    <dimen name="text_size_lg">18sp</dimen>
+    <dimen name="text_size_xl">20sp</dimen>
+    <dimen name="text_size_title">22sp</dimen>
+    <dimen name="text_size_headline">24sp</dimen>
+    <dimen name="text_size_display">32sp</dimen>
+</resources>

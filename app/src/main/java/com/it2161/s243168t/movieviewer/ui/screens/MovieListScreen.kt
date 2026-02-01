@@ -9,10 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -78,15 +74,14 @@ fun MovieListScreen(
             MovieAppTopAppBar(
                 title = stringResource(R.string.title_discover_movies),
                 canNavigateBack = false,
-                onNavigateBack = {}
-            ) {
-                IconButton(onClick = { }) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = stringResource(R.string.cd_more_options)
-                    )
+                onNavigateBack = {},
+                showOverflowMenu = true,
+                onLogout = {
+                    navController.navigate(Routes.Login.route) {
+                        popUpTo(Routes.MovieList.route) { inclusive = true }
+                    }
                 }
-            }
+            )
         },
         bottomBar = {
             MovieBottomAppBar(

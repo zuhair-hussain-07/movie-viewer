@@ -61,6 +61,7 @@ import com.it2161.s243168t.movieviewer.ui.components.MovieAppTopAppBar
 import com.it2161.s243168t.movieviewer.ui.components.RatingBadge
 import com.it2161.s243168t.movieviewer.ui.components.ReviewItemComponent
 import com.it2161.s243168t.movieviewer.ui.components.ShimmerBox
+import com.it2161.s243168t.movieviewer.ui.navigation.Routes
 import com.it2161.s243168t.movieviewer.ui.theme.Dimens
 import com.it2161.s243168t.movieviewer.ui.viewmodels.moviedetail.MovieDetailUiEffect
 import com.it2161.s243168t.movieviewer.ui.viewmodels.moviedetail.MovieDetailUiEvent
@@ -91,7 +92,13 @@ fun MovieDetailScreen(navController: NavController, movieId: Int) {
             MovieAppTopAppBar(
                 title = stringResource(R.string.title_movie_details),
                 canNavigateBack = true,
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                showOverflowMenu = true,
+                onLogout = {
+                    navController.navigate(Routes.Login.route) {
+                        popUpTo(Routes.MovieList.route) { inclusive = true }
+                    }
+                }
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }

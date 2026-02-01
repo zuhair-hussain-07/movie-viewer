@@ -62,7 +62,13 @@ fun FavoritesScreen(
             MovieAppTopAppBar(
                 title = stringResource(R.string.title_my_favorites),
                 canNavigateBack = false,
-                onNavigateBack = {}
+                onNavigateBack = {},
+                showOverflowMenu = true,
+                onLogout = {
+                    navController.navigate(Routes.Login.route) {
+                        popUpTo(Routes.MovieList.route) { inclusive = true }
+                    }
+                }
             )
         },
         bottomBar = {

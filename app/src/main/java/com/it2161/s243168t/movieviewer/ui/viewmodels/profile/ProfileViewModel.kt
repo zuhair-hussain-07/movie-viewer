@@ -77,7 +77,7 @@ class ProfileViewModel @Inject constructor(
             val state = _uiState.value
 
             if (state.newPassword.isNotEmpty() && !Validators.doPasswordsMatch(state.newPassword, state.confirmNewPassword)) {
-                emitEffect(ProfileUiEffect.ShowToast("Passwords do not match"))
+                emitEffect(ProfileUiEffect.ShowSnackbar("Passwords do not match"))
                 _uiState.update { it.copy(isLoading = false) }
                 return@launch
             }
@@ -86,7 +86,7 @@ class ProfileViewModel @Inject constructor(
             try {
                 dobDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(state.dob)
             } catch (e: Exception) {
-                emitEffect(ProfileUiEffect.ShowToast("Invalid date format. Please use dd/MM/yyyy."))
+                emitEffect(ProfileUiEffect.ShowSnackbar("Invalid date format. Please use dd/MM/yyyy."))
                 _uiState.update { it.copy(isLoading = false) }
                 return@launch
             }
@@ -100,7 +100,7 @@ class ProfileViewModel @Inject constructor(
                     password = if (state.newPassword.isNotEmpty()) state.newPassword else it.password
                 )
                 userRepository.updateUser(updatedUser)
-                emitEffect(ProfileUiEffect.ShowToast("Profile updated successfully"))
+                emitEffect(ProfileUiEffect.ShowSnackbar("Profile updated successfully"))
                 _uiState.update { it.copy(isLoading = false, isEditMode = false) }
             }
         }

@@ -32,8 +32,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,6 +59,10 @@ import com.it2161.s243168t.movieviewer.ui.viewmodels.moviedetail.MovieDetailView
 import com.it2161.s243168t.movieviewer.utils.formatRevenue
 import com.it2161.s243168t.movieviewer.utils.formatRuntime
 import java.text.NumberFormat
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.remember
+import com.it2161.s243168t.movieviewer.ui.viewmodels.moviedetail.MovieDetailUiEffect
 import java.util.Locale
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -64,6 +70,16 @@ import java.util.Locale
 fun MovieDetailScreen(navController: NavController, movieId: Int) {
     val viewModel: MovieDetailViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(key1 = true) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                is MovieDetailUiEffect.ShowSnackbar -> snackbarHostState.showSnackbar(effect.message)
+                MovieDetailUiEffect.NavigateBack -> navController.popBackStack()
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -72,7 +88,8 @@ fun MovieDetailScreen(navController: NavController, movieId: Int) {
                 canNavigateBack = true,
                 onNavigateBack = { navController.popBackStack() }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Column(
             modifier = Modifier

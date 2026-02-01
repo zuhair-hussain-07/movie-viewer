@@ -49,7 +49,7 @@ fun LoginScreen(
         viewModel.uiEffect.collect {
             when (it) {
                 is AuthUiEffect.Navigate -> navController.navigate(it.route)
-                is AuthUiEffect.ShowToast -> snackbarHostState.showSnackbar(it.message)
+                is AuthUiEffect.ShowSnackbar -> snackbarHostState.showSnackbar(it.message)
             }
         }
     }

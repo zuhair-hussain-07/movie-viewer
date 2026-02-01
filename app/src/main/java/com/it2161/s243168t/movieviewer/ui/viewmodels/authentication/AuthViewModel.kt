@@ -50,13 +50,13 @@ class AuthViewModel @Inject constructor(
             val state = _uiState.value
 
             if (state.userId.isBlank() || state.password.isBlank() || state.dob.isBlank() || state.preferredName.isBlank()) {
-                emitEffect(AuthUiEffect.ShowToast("All fields except profile picture are required."))
+                emitEffect(AuthUiEffect.ShowSnackbar("All fields except profile picture are required."))
                 _uiState.update { it.copy(isLoading = false) }
                 return@launch
             }
 
             if (!Validators.doPasswordsMatch(state.password, state.confirmPassword)) {
-                emitEffect(AuthUiEffect.ShowToast("Passwords do not match"))
+                emitEffect(AuthUiEffect.ShowSnackbar("Passwords do not match"))
                 _uiState.update { it.copy(isLoading = false) }
                 return@launch
             }
@@ -66,13 +66,13 @@ class AuthViewModel @Inject constructor(
                 // Assuming the date format from the UI is dd/MM/yyyy
                 dobDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(state.dob)
             } catch (e: Exception) {
-                emitEffect(AuthUiEffect.ShowToast("Invalid date format. Please use dd/MM/yyyy."))
+                emitEffect(AuthUiEffect.ShowSnackbar("Invalid date format. Please use dd/MM/yyyy."))
                 _uiState.update { it.copy(isLoading = false) }
                 return@launch
             }
 
             if (!Validators.isDateOfBirthInPast(dobDate.time)) {
-                emitEffect(AuthUiEffect.ShowToast("Date of birth must be in the past."))
+                emitEffect(AuthUiEffect.ShowSnackbar("Date of birth must be in the past."))
                 _uiState.update { it.copy(isLoading = false) }
                 return@launch
             }
@@ -91,11 +91,11 @@ class AuthViewModel @Inject constructor(
                 if (loggedIn) {
                     emitEffect(AuthUiEffect.Navigate(Routes.MovieList.route))
                 } else {
-                    emitEffect(AuthUiEffect.ShowToast("Registration successful, but auto-login failed. Please log in manually."))
+                    emitEffect(AuthUiEffect.ShowSnackbar("Registration successful, but auto-login failed. Please log in manually."))
                     emitEffect(AuthUiEffect.Navigate(Routes.Login.route)) // Navigate to login screen
                 }
             } else {
-                emitEffect(AuthUiEffect.ShowToast("Registration failed. User ID may already exist."))
+                emitEffect(AuthUiEffect.ShowSnackbar("Registration failed. User ID may already exist."))
             }
             _uiState.update { it.copy(isLoading = false) }
         }
@@ -106,7 +106,7 @@ class AuthViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             val state = _uiState.value
             if (state.userId.isBlank() || state.password.isBlank()) {
-                emitEffect(AuthUiEffect.ShowToast("User ID and password cannot be empty."))
+                emitEffect(AuthUiEffect.ShowSnackbar("User ID and password cannot be empty."))
                 _uiState.update { it.copy(isLoading = false) }
                 return@launch
             }
@@ -115,7 +115,7 @@ class AuthViewModel @Inject constructor(
             if (success) {
                 emitEffect(AuthUiEffect.Navigate(Routes.MovieList.route))
             } else {
-                emitEffect(AuthUiEffect.ShowToast("Invalid credentials"))
+                emitEffect(AuthUiEffect.ShowSnackbar("Invalid credentials"))
             }
             _uiState.update { it.copy(isLoading = false) }
         }

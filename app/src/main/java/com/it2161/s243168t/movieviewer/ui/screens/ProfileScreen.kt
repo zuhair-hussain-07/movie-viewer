@@ -73,7 +73,7 @@ fun ProfileScreen(
     LaunchedEffect(key1 = true) {
         viewModel.uiEffect.collect {
             when (it) {
-                is ProfileUiEffect.ShowToast -> snackbarHostState.showSnackbar(it.message)
+                is ProfileUiEffect.ShowSnackbar -> snackbarHostState.showSnackbar(it.message)
                 ProfileUiEffect.NavigateBack -> navController.popBackStack()
             }
         }

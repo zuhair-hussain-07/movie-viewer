@@ -38,7 +38,7 @@ class MovieDetailViewModel @Inject constructor(
             observeFavoriteStatus(movieId)
         } else {
             viewModelScope.launch {
-                emitEffect(MovieDetailUiEffect.ShowToast("Invalid movie ID"))
+                emitEffect(MovieDetailUiEffect.ShowSnackbar("Invalid movie ID"))
             }
         }
     }
@@ -76,7 +76,7 @@ class MovieDetailViewModel @Inject constructor(
 
                 // Check if there's cached data
                 if (_uiState.value.movie == null) {
-                    emitEffect(MovieDetailUiEffect.ShowToast("Error loading movie details: ${e.message}"))
+                    emitEffect(MovieDetailUiEffect.ShowSnackbar("Error loading movie details: ${e.message}"))
                 }
                 e.printStackTrace()
             }
@@ -113,9 +113,9 @@ class MovieDetailViewModel @Inject constructor(
                 val currentFavorite = _uiState.value.isFavorite
                 movieRepository.toggleFavourite(movieId)
                 val message = if (currentFavorite) "Movie removed from favorites" else "Movie added to favorites"
-                emitEffect(MovieDetailUiEffect.ShowToast(message))
+                emitEffect(MovieDetailUiEffect.ShowSnackbar(message))
             } catch (e: Exception) {
-                emitEffect(MovieDetailUiEffect.ShowToast("Error updating favorites"))
+                emitEffect(MovieDetailUiEffect.ShowSnackbar("Error updating favorites"))
                 e.printStackTrace()
             }
         }

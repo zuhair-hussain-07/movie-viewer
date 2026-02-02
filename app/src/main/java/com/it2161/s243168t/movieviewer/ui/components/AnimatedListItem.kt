@@ -58,43 +58,6 @@ fun AnimatedListItem(
 }
 
 @Composable
-fun AnimatedListItemHorizontal(
-    index: Int,
-    fromRight: Boolean = false,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    val visibleState = remember {
-        MutableTransitionState(false).apply {
-            targetState = true
-        }
-    }
-
-    val delayMillis = (index.coerceAtMost(5)) * 50
-    val direction = if (fromRight) 1 else -1
-
-    AnimatedVisibility(
-        visibleState = visibleState,
-        modifier = modifier,
-        enter = slideInVertically(
-            animationSpec = tween(
-                durationMillis = 350,
-                delayMillis = delayMillis
-            ),
-            initialOffsetY = { fullHeight -> (fullHeight / 4) * direction }
-        ) + fadeIn(
-            animationSpec = tween(
-                durationMillis = 300,
-                delayMillis = delayMillis
-            )
-        ),
-        exit = fadeOut(animationSpec = tween(200))
-    ) {
-        content()
-    }
-}
-
-@Composable
 fun AnimatedFadeIn(
     index: Int,
     modifier: Modifier = Modifier,

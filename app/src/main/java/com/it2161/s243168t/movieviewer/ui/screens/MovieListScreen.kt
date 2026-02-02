@@ -6,9 +6,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -126,7 +127,7 @@ fun MovieListScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = Dimens.PaddingScreenHorizontal, vertical = Dimens.SpacingXs)
+                    .padding(horizontal = Dimens.PaddingScreenHorizontal, vertical = Dimens.SpacingXxs)
             )
 
             // Category Selection (LazyRow)
@@ -172,11 +173,13 @@ fun MovieListScreen(
                     )
                 }
                 else -> {
-                    LazyColumn(
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(1),
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(horizontal = Dimens.PaddingScreenHorizontal),
                         verticalArrangement = Arrangement.spacedBy(Dimens.SpacingLg),
+                        horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingLg),
                         contentPadding = PaddingValues(vertical = Dimens.PaddingScreenVertical)
                     ) {
                         itemsIndexed(

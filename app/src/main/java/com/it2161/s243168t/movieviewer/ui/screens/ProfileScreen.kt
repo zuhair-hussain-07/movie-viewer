@@ -10,6 +10,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,12 +44,12 @@ import com.it2161.s243168t.movieviewer.data.local.enums.LoadingType
 import com.it2161.s243168t.movieviewer.ui.components.ButtonComponent
 import com.it2161.s243168t.movieviewer.ui.components.CardComponent
 import com.it2161.s243168t.movieviewer.ui.components.ConfirmationDialog
+import com.it2161.s243168t.movieviewer.ui.components.DetailRowComponent
 import com.it2161.s243168t.movieviewer.ui.components.ErrorScreen
 import com.it2161.s243168t.movieviewer.ui.components.FormFieldComponent
 import com.it2161.s243168t.movieviewer.ui.components.LoadingScreen
 import com.it2161.s243168t.movieviewer.ui.components.MovieAppTopAppBar
 import com.it2161.s243168t.movieviewer.ui.components.MovieBottomAppBar
-import com.it2161.s243168t.movieviewer.ui.components.ProfileDetailRow
 import com.it2161.s243168t.movieviewer.ui.components.ProfilePictureComponent
 import com.it2161.s243168t.movieviewer.ui.navigation.Routes
 import com.it2161.s243168t.movieviewer.ui.theme.Dimens
@@ -205,9 +208,21 @@ fun ProfileScreen(
                         ProfilePictureComponent(uri = user.profilePicture, isEditing = false)
                         Spacer(modifier = Modifier.height(Dimens.SpacingSm))
                         CardComponent {
-                            ProfileDetailRow(label = stringResource(R.string.label_user_id), value = user.userId)
-                            ProfileDetailRow(label = stringResource(R.string.label_preferred_name), value = user.preferredName)
-                            ProfileDetailRow(label = stringResource(R.string.label_date_of_birth), value = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(user.dateOfBirth))
+                            DetailRowComponent(
+                                icon = Icons.Filled.AccountCircle,
+                                label = stringResource(R.string.label_user_id),
+                                value = user.userId
+                            )
+                            DetailRowComponent(
+                                icon = Icons.Filled.Person,
+                                label = stringResource(R.string.label_preferred_name),
+                                value = user.preferredName
+                            )
+                            DetailRowComponent(
+                                icon = Icons.Filled.CalendarToday,
+                                label = stringResource(R.string.label_date_of_birth),
+                                value = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(user.dateOfBirth)
+                            )
                         }
                         Spacer(modifier = Modifier.height(Dimens.SpacingLg))
                         ButtonComponent(

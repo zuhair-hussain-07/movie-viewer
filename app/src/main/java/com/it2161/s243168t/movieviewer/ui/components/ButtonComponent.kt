@@ -33,7 +33,7 @@ fun ButtonComponent(
         .fillMaxWidth()
         .padding(vertical = 4.dp)
 
-    val shape = RoundedCornerShape(8.dp)
+    val shape = RoundedCornerShape(6.dp)
 
     when (type) {
         ButtonType.PRIMARY_BUTTON -> {
@@ -43,6 +43,15 @@ fun ButtonComponent(
                 enabled = enabled,
                 shape = shape
             ) {
+                if (icon != null) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = iconContentDescription,
+                        modifier = Modifier
+                            .size(18.dp)
+                            .padding(end = 8.dp)
+                    )
+                }
                 Text(text)
             }
         }
@@ -53,6 +62,15 @@ fun ButtonComponent(
                 enabled = enabled,
                 shape = shape
             ) {
+                if (icon != null) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = iconContentDescription,
+                        modifier = Modifier
+                            .size(18.dp)
+                            .padding(end = 8.dp)
+                    )
+                }
                 Text(text)
             }
         }
@@ -77,6 +95,29 @@ fun ButtonComponent(
                     contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             ) {
+                Text(text)
+            }
+        }
+        ButtonType.FAVORITE_BUTTON -> {
+            Button(
+                onClick = onClick,
+                modifier = buttonModifier,
+                enabled = enabled,
+                shape = shape,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.primary,
+                    contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                if (icon != null) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = iconContentDescription,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .padding(end = 8.dp)
+                    )
+                }
                 Text(text)
             }
         }

@@ -15,7 +15,7 @@ object Dimens {
     val SpacingHuge = 48.dp
 
     // Screen padding
-    val PaddingScreenHorizontal = 16.dp
+    val PaddingScreenHorizontal = 12.dp
     val PaddingScreenVertical = 16.dp
 
     // Card padding

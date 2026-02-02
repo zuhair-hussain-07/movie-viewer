@@ -5,5 +5,6 @@ enum class ButtonType {
     PRIMARY_BUTTON,
     SECONDARY_BUTTON,
     SELECTABLE_BUTTON,
+    FAVORITE_BUTTON,
     ICON_TEXT
 }

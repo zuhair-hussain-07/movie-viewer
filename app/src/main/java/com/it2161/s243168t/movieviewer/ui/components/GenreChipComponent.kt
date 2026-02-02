@@ -1,6 +1,6 @@
 package com.it2161.s243168t.movieviewer.ui.components
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -20,10 +20,14 @@ fun GenreChipComponent(
         text = genre,
         style = MaterialTheme.typography.labelMedium,
         fontWeight = FontWeight.Medium,
-        color = MaterialTheme.colorScheme.onSecondaryContainer,
+        color = MaterialTheme.colorScheme.primary,
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .clip(RoundedCornerShape(6.dp))
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(6.dp)
+            )
             .padding(horizontal = 12.dp, vertical = 6.dp)
     )
 }

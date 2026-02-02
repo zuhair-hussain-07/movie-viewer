@@ -319,33 +319,76 @@ fun MovieDetailScreen(
                     Column(
                         verticalArrangement = Arrangement.spacedBy(Dimens.SpacingMd)
                     ) {
+                        // Row 1: Adult + Genres
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingLg)
                         ) {
-                            // Column 1
                             Column(modifier = Modifier.weight(1f)) {
                                 DetailItem(
-                                    label = "Language",
+                                    label = "Adult",
+                                    value = if (movie.adult) "Yes" else "No"
+                                )
+                            }
+                            Column(modifier = Modifier.weight(1f)) {
+                                DetailItem(
+                                    label = "Original Language",
                                     value = movie.originalLanguage.uppercase()
                                 )
-                                Spacer(modifier = Modifier.height(Dimens.SpacingMd))
+                            }
+                        }
+
+                        // Row 2: Release Date + Runtime
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingLg)
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
                                 DetailItem(
-                                    label = "Votes",
+                                    label = "Release Date",
+                                    value = movie.releaseDate
+                                )
+                            }
+                            Column(modifier = Modifier.weight(1f)) {
+                                DetailItem(
+                                    label = "Runtime",
+                                    value = formatRuntime(movie.runtime)
+                                )
+                            }
+                        }
+
+                        // Row 3: Vote Count + Vote Average
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingLg)
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                DetailItem(
+                                    label = "Vote Count",
                                     value = NumberFormat.getNumberInstance(Locale.US).format(movie.voteCount)
                                 )
                             }
-                            // Column 2
+                            Column(modifier = Modifier.weight(1f)) {
+                                DetailItem(
+                                    label = "Vote Average",
+                                    value = String.format(Locale.US, "%.1f / 10", movie.voteAverage)
+                                )
+                            }
+                        }
+
+                        // Row 4: Revenue
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingLg)
+                        ) {
                             Column(modifier = Modifier.weight(1f)) {
                                 DetailItem(
                                     label = "Revenue",
                                     value = formatRevenue(movie.revenue)
                                 )
-                                Spacer(modifier = Modifier.height(Dimens.SpacingMd))
-                                DetailItem(
-                                    label = "Release Date",
-                                    value = movie.releaseDate
-                                )
+                            }
+                            Column(modifier = Modifier.weight(1f)) {
+                                // Empty column to maintain grid structure
                             }
                         }
                     }

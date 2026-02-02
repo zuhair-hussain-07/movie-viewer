@@ -131,7 +131,7 @@ fun FavoritesScreen(
                             items = uiState.movies,
                             key = { _, movie -> movie.id }
                         ) { index, movie ->
-                            AnimatedListItem(index = index) {
+                            AnimatedListItem(index = index, columns = 2) {
                                 MovieCard(
                                     movie = movie,
                                     onClick = {

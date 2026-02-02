@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 fun AnimatedListItem(
     index: Int,
     modifier: Modifier = Modifier,
+    columns: Int = 1,
     content: @Composable () -> Unit
 ) {
     val visibleState = remember {
@@ -26,8 +27,10 @@ fun AnimatedListItem(
         }
     }
 
-    // Calculate staggered delay based on index (max 5 items staggered)
-    val delayMillis = (index.coerceAtMost(5)) * 50
+    // Calculate row-based delay for grid layouts
+    // For a 2-column grid: items 0,1 are row 0 (0ms), items 2,3 are row 1 (50ms), etc.
+    val row = index / columns
+    val delayMillis = (row.coerceAtMost(5)) * 50
 
     AnimatedVisibility(
         visibleState = visibleState,

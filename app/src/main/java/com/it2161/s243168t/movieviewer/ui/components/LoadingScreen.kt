@@ -10,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +20,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -89,11 +92,14 @@ private fun SkeletonListLoading(
     itemCount: Int = 3,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = Dimens.PaddingScreenHorizontal),
-        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingLg)
+        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingLg),
+        horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingLg),
+        contentPadding = PaddingValues(vertical = Dimens.PaddingScreenVertical)
     ) {
         items(itemCount) {
             MovieCardSkeleton()
@@ -166,7 +172,6 @@ private fun SkeletonDetailLoading(modifier: Modifier = Modifier) {
 fun MovieCardSkeleton(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
-            .fillMaxWidth()
             .clip(RoundedCornerShape(Dimens.CornerRadiusLg))
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
     ) {
@@ -174,7 +179,7 @@ fun MovieCardSkeleton(modifier: Modifier = Modifier) {
         ShimmerBox(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(Dimens.MovieCardImageHeight)
+                .height(Dimens.MovieCardGridPosterHeight)
                 .clip(RoundedCornerShape(topStart = Dimens.CornerRadiusLg, topEnd = Dimens.CornerRadiusLg))
         )
 
@@ -186,41 +191,13 @@ fun MovieCardSkeleton(modifier: Modifier = Modifier) {
             ShimmerBox(
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
-                    .height(20.dp)
-                    .clip(RoundedCornerShape(Dimens.CornerRadiusSm))
-            )
-
-            Spacer(modifier = Modifier.height(Dimens.SpacingSm))
-
-            // Description lines
-            ShimmerBox(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(14.dp)
+                    .height(16.dp)
                     .clip(RoundedCornerShape(Dimens.CornerRadiusSm))
             )
 
             Spacer(modifier = Modifier.height(Dimens.SpacingXs))
 
-            ShimmerBox(
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .height(14.dp)
-                    .clip(RoundedCornerShape(Dimens.CornerRadiusSm))
-            )
-
-            Spacer(modifier = Modifier.height(Dimens.SpacingXs))
-
-            ShimmerBox(
-                modifier = Modifier
-                    .fillMaxWidth(0.6f)
-                    .height(14.dp)
-                    .clip(RoundedCornerShape(Dimens.CornerRadiusSm))
-            )
-
-            Spacer(modifier = Modifier.height(Dimens.SpacingSm))
-
-            // Release date
+            // Category/Genre line
             ShimmerBox(
                 modifier = Modifier
                     .width(100.dp)

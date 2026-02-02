@@ -8,10 +8,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -30,12 +28,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import com.it2161.s243168t.movieviewer.R
 import com.it2161.s243168t.movieviewer.data.local.models.Movie
 import com.it2161.s243168t.movieviewer.ui.theme.Dimens
 
@@ -43,9 +39,7 @@ import com.it2161.s243168t.movieviewer.ui.theme.Dimens
 fun MovieCard(
     movie: Movie,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    isFavorite: Boolean = false,
-    onToggleFavorite: (() -> Unit)? = null
+    modifier: Modifier = Modifier
 ) {
     // Card press animation
     val interactionSource = remember { MutableInteractionSource() }
@@ -68,7 +62,6 @@ fun MovieCard(
 
     Card(
         modifier = modifier
-            .fillMaxWidth()
             .scale(cardScale)
             .clickable(
                 interactionSource = interactionSource,
@@ -81,99 +74,73 @@ fun MovieCard(
         )
     ) {
         Column {
-            // Movie Backdrop Image with crossfade
+            // Movie Poster Image with crossfade
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(Dimens.MovieCardImageHeight)
+                    .height(Dimens.MovieCardGridPosterHeight)
                     .clip(RoundedCornerShape(topStart = Dimens.CornerRadiusLg, topEnd = Dimens.CornerRadiusLg))
             ) {
-                if (movie.backdropPath.isNotEmpty()) {
+                if (movie.posterPath.isNotEmpty()) {
                     SubcomposeAsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data("https://image.tmdb.org/t/p/w500${movie.backdropPath}")
+                            .data("https://image.tmdb.org/t/p/w500${movie.posterPath}")
                             .crossfade(true)
                             .crossfade(300)
                             .build(),
                         contentDescription = movie.title,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(Dimens.MovieCardImageHeight),
+                            .height(Dimens.MovieCardGridPosterHeight),
                         contentScale = ContentScale.Crop,
                         loading = {
                             ShimmerBox(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(Dimens.MovieCardImageHeight)
+                                    .height(Dimens.MovieCardGridPosterHeight)
                             )
                         },
                         error = {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(Dimens.MovieCardImageHeight)
+                                    .height(Dimens.MovieCardGridPosterHeight)
                                     .background(MaterialTheme.colorScheme.surfaceVariant)
                             )
                         }
                     )
                 } else {
-                    // Placeholder if no backdrop image
+                    // Placeholder if no poster image
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(Dimens.MovieCardImageHeight)
+                            .height(Dimens.MovieCardGridPosterHeight)
                             .background(MaterialTheme.colorScheme.surfaceVariant)
                     )
                 }
 
-                // Top Row: Favorite button (left) and Rating Badge (right)
-                Row(
+                // Rating Badge (Top Right only)
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .align(Alignment.TopEnd)
                         .padding(Dimens.SpacingMd),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Top
+                    contentAlignment = Alignment.TopEnd
                 ) {
-                    // Favorite Button (Top Left) with animation
-                    if (onToggleFavorite != null) {
-                        AnimatedFavoriteButton(
-                            isFavorite = isFavorite,
-                            onToggle = onToggleFavorite
-                        )
-                    }
-
-                    // Rating Badge (Top Right)
                     RatingBadge(rating = movie.voteAverage)
                 }
             }
 
-            // Movie Info
+            // Movie Info - Title only
             Column(
                 modifier = Modifier.padding(Dimens.PaddingCard)
             ) {
                 Text(
                     text = movie.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 2,
+                    style = MaterialTheme.typography.titleSmall,
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurface
-                )
-
-                Text(
-                    text = movie.overview,
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = Dimens.SpacingSm)
-                )
-
-                Text(
-                    text = stringResource(R.string.label_release_date, movie.releaseDate),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.padding(top = Dimens.SpacingSm)
                 )
             }
         }

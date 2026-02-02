@@ -53,6 +53,7 @@ object Dimens {
 
     // Image dimensions
     val MovieCardImageHeight = 200.dp
+    val MovieCardGridPosterHeight = 220.dp  // For 2-column grid poster display
     val MovieDetailBackdropHeight = 200.dp
     val PosterWidth = 120.dp
 

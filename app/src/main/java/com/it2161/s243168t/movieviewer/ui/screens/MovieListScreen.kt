@@ -174,7 +174,7 @@ fun MovieListScreen(
                 }
                 else -> {
                     LazyVerticalGrid(
-                        columns = GridCells.Fixed(1),
+                        columns = GridCells.Fixed(2),
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(horizontal = Dimens.PaddingScreenHorizontal),
@@ -191,10 +191,6 @@ fun MovieListScreen(
                                     movie = movie,
                                     onClick = {
                                         viewModel.onEvent(MovieUiEvent.OnMovieClicked(movie.id))
-                                    },
-                                    isFavorite = movie.id in uiState.favoriteIds,
-                                    onToggleFavorite = {
-                                        viewModel.onEvent(MovieUiEvent.ToggleFavorite(movie))
                                     }
                                 )
                             }

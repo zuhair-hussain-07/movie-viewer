@@ -144,7 +144,7 @@ fun MovieListScreen(
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = Dimens.PaddingScreenHorizontal, vertical = Dimens.SpacingXs),
+                    .padding(horizontal = Dimens.PaddingScreenHorizontal, vertical = Dimens.SpacingXxs),
                 horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingSm)
             ) {
                 items(categories.size) { index ->

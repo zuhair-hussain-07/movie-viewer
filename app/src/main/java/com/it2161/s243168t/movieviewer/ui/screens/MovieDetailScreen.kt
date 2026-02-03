@@ -53,6 +53,7 @@ import com.it2161.s243168t.movieviewer.ui.components.ErrorScreen
 import com.it2161.s243168t.movieviewer.ui.components.GenreChipComponent
 import com.it2161.s243168t.movieviewer.ui.components.LoadingScreen
 import com.it2161.s243168t.movieviewer.ui.components.MovieAppTopAppBar
+import com.it2161.s243168t.movieviewer.ui.components.NetworkStatusBanner
 import com.it2161.s243168t.movieviewer.ui.components.ReviewItemComponent
 import com.it2161.s243168t.movieviewer.ui.components.ShimmerBox
 import com.it2161.s243168t.movieviewer.ui.navigation.Routes
@@ -72,6 +73,8 @@ import java.util.Locale
 fun MovieDetailScreen(
     navController: NavController,
     movieId: Int,
+    isNetworkConnected: Boolean,
+    viewModel: MovieDetailViewModel = hiltViewModel(),
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val viewModel: MovieDetailViewModel = hiltViewModel()
@@ -117,9 +120,18 @@ fun MovieDetailScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
+                .padding(top = paddingValues.calculateTopPadding())
         ) {
+            // Network Status Banner (sits directly below TopAppBar)
+            NetworkStatusBanner(isConnected = isNetworkConnected)
+
+            // Content with remaining scaffold padding
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = paddingValues.calculateBottomPadding())
+                    .verticalScroll(rememberScrollState())
+            ) {
             // Loading state
             if (uiState.isLoading) {
                 LoadingScreen(loadingType = LoadingType.SKELETON_DETAIL)
@@ -427,6 +439,7 @@ fun MovieDetailScreen(
                     errorType = ErrorType.NO_DATA,
                     title = stringResource(R.string.msg_no_movie_data)
                 )
+            }
             }
         }
     }

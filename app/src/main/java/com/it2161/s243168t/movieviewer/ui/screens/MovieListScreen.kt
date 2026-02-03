@@ -33,6 +33,7 @@ import com.it2161.s243168t.movieviewer.ui.components.LoadingScreen
 import com.it2161.s243168t.movieviewer.ui.components.MovieAppTopAppBar
 import com.it2161.s243168t.movieviewer.ui.components.MovieBottomAppBar
 import com.it2161.s243168t.movieviewer.ui.components.MovieCard
+import com.it2161.s243168t.movieviewer.ui.components.NetworkStatusBanner
 import com.it2161.s243168t.movieviewer.ui.components.SearchBarComponent
 import com.it2161.s243168t.movieviewer.ui.navigation.Routes
 import com.it2161.s243168t.movieviewer.ui.theme.Dimens
@@ -45,12 +46,12 @@ import com.it2161.s243168t.movieviewer.ui.viewmodels.authentication.AuthUiEvent
 @Composable
 fun MovieListScreen(
     navController: NavController,
-    currentRoute: String = Routes.MovieList.route,
+    isNetworkConnected: Boolean,
     viewModel: MovieViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = hiltViewModel(),
+    currentRoute: String = Routes.MovieList.route
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val authUiState by authViewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(key1 = true) {
@@ -117,8 +118,17 @@ fun MovieListScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(top = padding.calculateTopPadding())
         ) {
+            // Network Status Banner (sits directly below TopAppBar)
+            NetworkStatusBanner(isConnected = isNetworkConnected)
+
+            // Content with remaining scaffold padding
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = padding.calculateBottomPadding())
+            ) {
             // Search Bar
             SearchBarComponent(
                 searchQuery = uiState.searchQuery,
@@ -197,6 +207,7 @@ fun MovieListScreen(
                         }
                     }
                 }
+            }
             }
         }
     }

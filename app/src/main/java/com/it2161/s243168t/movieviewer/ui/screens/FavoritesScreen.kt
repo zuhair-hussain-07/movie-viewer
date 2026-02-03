@@ -2,6 +2,7 @@ package com.it2161.s243168t.movieviewer.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -29,6 +30,7 @@ import com.it2161.s243168t.movieviewer.ui.components.LoadingScreen
 import com.it2161.s243168t.movieviewer.ui.components.MovieAppTopAppBar
 import com.it2161.s243168t.movieviewer.ui.components.MovieBottomAppBar
 import com.it2161.s243168t.movieviewer.ui.components.MovieCard
+import com.it2161.s243168t.movieviewer.ui.components.NetworkStatusBanner
 import com.it2161.s243168t.movieviewer.ui.navigation.Routes
 import com.it2161.s243168t.movieviewer.ui.theme.Dimens
 import com.it2161.s243168t.movieviewer.ui.viewmodels.favorites.FavoritesUiEffect
@@ -40,9 +42,10 @@ import com.it2161.s243168t.movieviewer.ui.viewmodels.authentication.AuthUiEvent
 @Composable
 fun FavoritesScreen(
     navController: NavController,
-    currentRoute: String = Routes.Favorites.route,
+    isNetworkConnected: Boolean,
     viewModel: FavoritesViewModel = hiltViewModel(),
-    authViewModel: AuthViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = hiltViewModel(),
+    currentRoute: String = Routes.Favorites.route
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -99,11 +102,20 @@ fun FavoritesScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(top = padding.calculateTopPadding())
         ) {
+            // Network Status Banner (sits directly below TopAppBar)
+            NetworkStatusBanner(isConnected = isNetworkConnected)
+
+            // Content with remaining scaffold padding
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = padding.calculateBottomPadding())
+            ) {
             when {
                 uiState.isLoading -> {
                     LoadingScreen(loadingType = LoadingType.SKELETON_LIST, itemCount = 3)
@@ -143,6 +155,7 @@ fun FavoritesScreen(
                     }
                 }
             }
+        }
         }
     }
 }

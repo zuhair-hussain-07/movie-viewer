@@ -50,6 +50,8 @@ import com.it2161.s243168t.movieviewer.ui.components.FormFieldComponent
 import com.it2161.s243168t.movieviewer.ui.components.LoadingScreen
 import com.it2161.s243168t.movieviewer.ui.components.MovieAppTopAppBar
 import com.it2161.s243168t.movieviewer.ui.components.MovieBottomAppBar
+import com.it2161.s243168t.movieviewer.ui.components.NetworkStatusBanner
+import com.it2161.s243168t.movieviewer.ui.components.ProfilePictureComponent
 import com.it2161.s243168t.movieviewer.ui.components.ProfilePictureComponent
 import com.it2161.s243168t.movieviewer.ui.navigation.Routes
 import com.it2161.s243168t.movieviewer.ui.theme.Dimens
@@ -65,8 +67,9 @@ import java.util.Locale
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    currentRoute: String = Routes.Profile.route,
-    viewModel: ProfileViewModel = hiltViewModel()
+    isNetworkConnected: Boolean,
+    viewModel: ProfileViewModel = hiltViewModel(),
+    currentRoute: String = Routes.Profile.route
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -120,13 +123,22 @@ fun ProfileScreen(
     ) {
         Column(
             modifier = Modifier
-                .padding(it)
                 .fillMaxSize()
-                .padding(horizontal = Dimens.PaddingScreenHorizontal)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(top = it.calculateTopPadding())
         ) {
+            // Network Status Banner (sits directly below TopAppBar)
+            NetworkStatusBanner(isConnected = isNetworkConnected)
+
+            // Content with remaining scaffold padding
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = it.calculateBottomPadding())
+                    .padding(horizontal = Dimens.PaddingScreenHorizontal)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
             if (uiState.isLoading) {
                 LoadingScreen(loadingType = LoadingType.SPINNER)
             } else if (uiState.user == null) {
@@ -237,6 +249,7 @@ fun ProfileScreen(
                         )
                     }
                 }
+            }
             }
         }
     }

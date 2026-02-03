@@ -30,16 +30,35 @@ fun NavGraph(
         composable(Routes.Register.route) {
             RegistrationScreen(navController = navController)
         }
-        composable(Routes.Profile.route) { ProfileScreen(navController = navController) }
-        composable(Routes.MovieList.route) { MovieListScreen(navController = navController) }
+        composable(Routes.Profile.route) {
+            ProfileScreen(
+                navController = navController,
+                isNetworkConnected = isNetworkConnected
+            )
+        }
+        composable(Routes.MovieList.route) {
+            MovieListScreen(
+                navController = navController,
+                isNetworkConnected = isNetworkConnected
+            )
+        }
         composable(
             route = Routes.MovieDetail.route,
             arguments = listOf(
                 navArgument("movieId") { type = NavType.IntType }
             )
         ) { backStackEntry ->
-            MovieDetailScreen(navController = navController, movieId = -1)
+            MovieDetailScreen(
+                navController = navController,
+                movieId = -1,
+                isNetworkConnected = isNetworkConnected
+            )
         }
-        composable(Routes.Favorites.route) { FavoritesScreen(navController = navController) }
+        composable(Routes.Favorites.route) {
+            FavoritesScreen(
+                navController = navController,
+                isNetworkConnected = isNetworkConnected
+            )
+        }
     }
 }

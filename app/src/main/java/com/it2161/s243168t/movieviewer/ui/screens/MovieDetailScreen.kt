@@ -22,8 +22,10 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -77,7 +79,6 @@ fun MovieDetailScreen(
     viewModel: MovieDetailViewModel = hiltViewModel(),
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
-    val viewModel: MovieDetailViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -85,6 +86,18 @@ fun MovieDetailScreen(
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 is MovieDetailUiEffect.ShowSnackbar -> snackbarHostState.showSnackbar(effect.message)
+                is MovieDetailUiEffect.ShowSnackbarWithUndo -> {
+                    snackbarHostState.showSnackbar(
+                        message = effect.message,
+                        actionLabel = "Undo",
+                        duration = SnackbarDuration.Short,
+                        withDismissAction = true
+                    ).let { result ->
+                        if (result == SnackbarResult.ActionPerformed) {
+                            effect.onUndo()
+                        }
+                    }
+                }
                 MovieDetailUiEffect.NavigateBack -> navController.popBackStack()
             }
         }

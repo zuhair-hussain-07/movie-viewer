@@ -113,7 +113,23 @@ class MovieDetailViewModel @Inject constructor(
                 val currentFavorite = _uiState.value.isFavorite
                 movieRepository.toggleFavourite(movieId)
                 val message = if (currentFavorite) "Movie removed from favorites" else "Movie added to favorites"
-                emitEffect(MovieDetailUiEffect.ShowSnackbar(message))
+
+                // Emit snackbar with undo action
+                emitEffect(
+                    MovieDetailUiEffect.ShowSnackbarWithUndo(
+                        message = message,
+                        onUndo = {
+                            // Toggle favorite again to undo the action
+                            viewModelScope.launch {
+                                try {
+                                    movieRepository.toggleFavourite(movieId)
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            }
+                        }
+                    )
+                )
             } catch (e: Exception) {
                 emitEffect(MovieDetailUiEffect.ShowSnackbar("Error updating favorites"))
                 e.printStackTrace()

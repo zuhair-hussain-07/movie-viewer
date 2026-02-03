@@ -1,5 +1,9 @@
 package com.it2161.s243168t.movieviewer.ui.components
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +20,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -28,9 +36,18 @@ fun ReviewItemComponent(
     review: Review,
     modifier: Modifier = Modifier
 ) {
+    var isExpanded by remember { mutableStateOf(false) }
+
     CardComponent {
         Column(
-            modifier = modifier.fillMaxWidth()
+            modifier = modifier
+                .fillMaxWidth()
+                .animateContentSize(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    )
+                )
         ) {
             // Author row
             Row(
@@ -60,13 +77,28 @@ fun ReviewItemComponent(
             Spacer(modifier = Modifier.height(12.dp))
 
             // Review content
-            Text(
-                text = review.content,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 5,
-                overflow = TextOverflow.Ellipsis
-            )
+            Column {
+                Text(
+                    text = review.content,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = if (isExpanded) Int.MAX_VALUE else 5,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                // Show "more..." if text is truncated
+                if (review.content.length > 200 || review.content.lines().size > 5) {
+                    Text(
+                        text = if (isExpanded) "Show less" else "more...",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier
+                            .clickable { isExpanded = !isExpanded }
+                            .padding(top = 4.dp)
+                    )
+                }
+            }
         }
     }
 }

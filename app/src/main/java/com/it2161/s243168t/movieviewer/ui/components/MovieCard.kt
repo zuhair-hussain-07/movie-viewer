@@ -30,8 +30,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.Image
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ImageNotSupported
+import androidx.compose.ui.res.painterResource
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import com.it2161.s243168t.movieviewer.R
 import com.it2161.s243168t.movieviewer.data.local.models.Movie
 import com.it2161.s243168t.movieviewer.ui.theme.Dimens
 
@@ -101,21 +107,25 @@ fun MovieCard(
                             )
                         },
                         error = {
-                            Box(
+                            Image(
+                                painter = painterResource(id = R.drawable.poster_placeholder),
+                                contentDescription = "Poster not available",
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(Dimens.MovieCardGridPosterHeight)
-                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .height(Dimens.MovieCardGridPosterHeight),
+                                contentScale = ContentScale.Crop
                             )
                         }
                     )
                 } else {
                     // Placeholder if no poster image
-                    Box(
+                    Image(
+                        painter = painterResource(id = R.drawable.poster_placeholder),
+                        contentDescription = "Poster not available",
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(Dimens.MovieCardGridPosterHeight)
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .height(Dimens.MovieCardGridPosterHeight),
+                        contentScale = ContentScale.Crop
                     )
                 }
 

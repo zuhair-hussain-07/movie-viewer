@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -85,19 +87,7 @@ fun MovieDetailScreen(
     LaunchedEffect(key1 = true) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
-                is MovieDetailUiEffect.ShowSnackbar -> snackbarHostState.showSnackbar(effect.message)
-                is MovieDetailUiEffect.ShowSnackbarWithUndo -> {
-                    snackbarHostState.showSnackbar(
-                        message = effect.message,
-                        actionLabel = "Undo",
-                        duration = SnackbarDuration.Short,
-                        withDismissAction = true
-                    ).let { result ->
-                        if (result == SnackbarResult.ActionPerformed) {
-                            effect.onUndo()
-                        }
-                    }
-                }
+                is MovieDetailUiEffect.ShowSnackbar -> {}
                 MovieDetailUiEffect.NavigateBack -> navController.popBackStack()
             }
         }
@@ -182,13 +172,22 @@ fun MovieDetailScreen(
                             contentScale = ContentScale.Crop,
                             loading = {
                                 ShimmerBox(modifier = Modifier.fillMaxSize())
+                            },
+                            error = {
+                                Image(
+                                    painter = painterResource(id = R.drawable.backdrop_placeholder),
+                                    contentDescription = "Backdrop not available",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
                             }
                         )
                     } else {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                        Image(
+                            painter = painterResource(id = R.drawable.backdrop_placeholder),
+                            contentDescription = "Backdrop not available",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
                         )
                     }
 

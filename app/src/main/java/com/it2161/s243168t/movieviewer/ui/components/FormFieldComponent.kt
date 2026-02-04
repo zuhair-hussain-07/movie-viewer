@@ -43,7 +43,7 @@ fun FormFieldComponent(
             label = { Text(label) },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(vertical = 4.dp),
             shape = RoundedCornerShape(8.dp),
             visualTransformation = if (type == FormFieldType.PASSWORD && !isPasswordVisible) {
                 PasswordVisualTransformation()

@@ -3,6 +3,7 @@
 
     <!-- Navigation & Titles -->
     <string name="title_discover_movies">Discover Movies</string>
+    <string name="title_popcorn_movies">PopCornMovie</string>
     <string name="title_movie_details">Movie Details</string>
     <string name="title_my_favorites">My Favorites</string>
     <string name="title_my_profile">My Profile</string>

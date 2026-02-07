@@ -90,7 +90,7 @@ fun MovieListScreen(
     Scaffold(
         topBar = {
             MovieAppTopAppBar(
-                title = stringResource(R.string.title_discover_movies),
+                title = stringResource(R.string.title_popcorn_movies),
                 canNavigateBack = false,
                 onNavigateBack = {},
                 showOverflowMenu = true,

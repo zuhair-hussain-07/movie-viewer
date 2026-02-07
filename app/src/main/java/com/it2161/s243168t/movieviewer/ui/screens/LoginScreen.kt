@@ -77,9 +77,10 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(Dimens.SpacingLg))
 
             Text(
-                text = stringResource(R.string.title_welcome_back),
+                text = stringResource(R.string.title_popcorn_movies),
                 style = MaterialTheme.typography.headlineMedium
             )
+            Spacer(modifier = Modifier.height(Dimens.SpacingXxs))
             Text(
                 text = stringResource(R.string.msg_login_subtitle),
                 style = MaterialTheme.typography.bodyMedium,

@@ -83,6 +83,7 @@ fun FavoritesScreen(
                 canNavigateBack = false,
                 onNavigateBack = {},
                 showOverflowMenu = true,
+                isNetworkConnected = isNetworkConnected,
                 onLogout = {
                     authViewModel.onEvent(AuthUiEvent.OnLogoutClicked)
                 }
@@ -107,8 +108,6 @@ fun FavoritesScreen(
                 .fillMaxSize()
                 .padding(top = padding.calculateTopPadding())
         ) {
-            // Network Status Banner (sits directly below TopAppBar)
-            NetworkStatusBanner(isConnected = isNetworkConnected)
 
             // Content with remaining scaffold padding
             Box(

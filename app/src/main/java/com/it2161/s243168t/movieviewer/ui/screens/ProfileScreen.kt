@@ -50,7 +50,6 @@ import com.it2161.s243168t.movieviewer.ui.components.FormFieldComponent
 import com.it2161.s243168t.movieviewer.ui.components.LoadingScreen
 import com.it2161.s243168t.movieviewer.ui.components.MovieAppTopAppBar
 import com.it2161.s243168t.movieviewer.ui.components.MovieBottomAppBar
-import com.it2161.s243168t.movieviewer.ui.components.NetworkStatusBanner
 import com.it2161.s243168t.movieviewer.ui.components.ProfilePictureComponent
 import com.it2161.s243168t.movieviewer.ui.components.ProfilePictureComponent
 import com.it2161.s243168t.movieviewer.ui.navigation.Routes
@@ -94,7 +93,8 @@ fun ProfileScreen(
             MovieAppTopAppBar(
                 title = if (uiState.isEditMode) stringResource(R.string.title_edit_profile) else stringResource(R.string.title_my_profile),
                 canNavigateBack = uiState.isEditMode,
-                onNavigateBack = { viewModel.onEvent(ProfileUiEvent.OnEditToggle) }
+                onNavigateBack = { viewModel.onEvent(ProfileUiEvent.OnEditToggle) },
+                isNetworkConnected = isNetworkConnected
             ) {
                 if (!uiState.isEditMode) {
                     IconButton(onClick = { showSignOutDialog = true }) {
@@ -126,8 +126,6 @@ fun ProfileScreen(
                 .fillMaxSize()
                 .padding(top = it.calculateTopPadding())
         ) {
-            // Network Status Banner (sits directly below TopAppBar)
-            NetworkStatusBanner(isConnected = isNetworkConnected)
 
             // Content with remaining scaffold padding
             Column(

@@ -33,7 +33,6 @@ import com.it2161.s243168t.movieviewer.ui.components.LoadingScreen
 import com.it2161.s243168t.movieviewer.ui.components.MovieAppTopAppBar
 import com.it2161.s243168t.movieviewer.ui.components.MovieBottomAppBar
 import com.it2161.s243168t.movieviewer.ui.components.MovieCard
-import com.it2161.s243168t.movieviewer.ui.components.NetworkStatusBanner
 import com.it2161.s243168t.movieviewer.ui.components.SearchBarComponent
 import com.it2161.s243168t.movieviewer.ui.navigation.Routes
 import com.it2161.s243168t.movieviewer.ui.theme.Dimens
@@ -95,6 +94,7 @@ fun MovieListScreen(
                 canNavigateBack = false,
                 onNavigateBack = {},
                 showOverflowMenu = true,
+                isNetworkConnected = isNetworkConnected,
                 onLogout = {
                     authViewModel.onEvent(AuthUiEvent.OnLogoutClicked)
                 }
@@ -120,8 +120,6 @@ fun MovieListScreen(
                 .fillMaxSize()
                 .padding(top = padding.calculateTopPadding())
         ) {
-            // Network Status Banner (sits directly below TopAppBar)
-            NetworkStatusBanner(isConnected = isNetworkConnected)
 
             // Content with remaining scaffold padding
             Column(

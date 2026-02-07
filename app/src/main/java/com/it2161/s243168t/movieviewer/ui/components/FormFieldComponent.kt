@@ -60,7 +60,7 @@ fun FormFieldComponent(
                     FormFieldType.PASSWORD -> {
                         IconButton(onClick = onPasswordVisibilityToggle) {
                             Icon(
-                                imageVector = if (isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                                imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                                 contentDescription = "Toggle password visibility"
                             )
                         }

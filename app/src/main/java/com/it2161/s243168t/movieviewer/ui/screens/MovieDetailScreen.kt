@@ -57,7 +57,8 @@ import com.it2161.s243168t.movieviewer.ui.components.ErrorScreen
 import com.it2161.s243168t.movieviewer.ui.components.GenreChipComponent
 import com.it2161.s243168t.movieviewer.ui.components.LoadingScreen
 import com.it2161.s243168t.movieviewer.ui.components.MovieAppTopAppBar
-import com.it2161.s243168t.movieviewer.ui.components.NetworkStatusBanner
+import com.it2161.s243168t.movieviewer.ui.components.MovieCard
+import com.it2161.s243168t.movieviewer.ui.components.RatingBadge
 import com.it2161.s243168t.movieviewer.ui.components.ReviewItemComponent
 import com.it2161.s243168t.movieviewer.ui.components.ShimmerBox
 import com.it2161.s243168t.movieviewer.ui.navigation.Routes
@@ -113,6 +114,7 @@ fun MovieDetailScreen(
                 canNavigateBack = true,
                 onNavigateBack = { navController.popBackStack() },
                 showOverflowMenu = true,
+                isNetworkConnected = isNetworkConnected,
                 onLogout = {
                     authViewModel.onEvent(AuthUiEvent.OnLogoutClicked)
                 }
@@ -124,11 +126,7 @@ fun MovieDetailScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding())
-        ) {
-            // Network Status Banner (sits directly below TopAppBar)
-            NetworkStatusBanner(isConnected = isNetworkConnected)
-
-            // Content with remaining scaffold padding
+        ) {            // Content with remaining scaffold padding
             Column(
                 modifier = Modifier
                     .fillMaxSize()

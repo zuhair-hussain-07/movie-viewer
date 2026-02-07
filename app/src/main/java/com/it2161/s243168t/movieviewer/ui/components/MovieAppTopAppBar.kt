@@ -1,5 +1,6 @@
 package com.it2161.s243168t.movieviewer.ui.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -30,62 +31,66 @@ fun MovieAppTopAppBar(
     onNavigateBack: () -> Unit,
     showOverflowMenu: Boolean = false,
     onLogout: () -> Unit = {},
+    isNetworkConnected: Boolean = true,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    TopAppBar(
-        title = { Text(title) },
-        navigationIcon = {
-            if (canNavigateBack) {
-                IconButton(onClick = onNavigateBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.cd_back)
-                    )
+    Column {
+        TopAppBar(
+            title = { Text(title) },
+            navigationIcon = {
+                if (canNavigateBack) {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.cd_back)
+                        )
+                    }
                 }
-            }
-        },
-        actions = {
-            // Custom actions first
-            actions()
+            },
+            actions = {
+                // Custom actions first
+                actions()
 
-            // Overflow menu if enabled
-            if (showOverflowMenu) {
-                IconButton(onClick = { expanded = true }) {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = stringResource(R.string.cd_more_options)
-                    )
-                }
+                // Overflow menu if enabled
+                if (showOverflowMenu) {
+                    IconButton(onClick = { expanded = true }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = stringResource(R.string.cd_more_options)
+                        )
+                    }
 
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    DropdownMenuItem(
-                        text = {
-                            Text(stringResource(R.string.btn_sign_out))
-                        },
-                        onClick = {
-                            expanded = false
-                            onLogout()
-                        },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Logout,
-                                contentDescription = null
-                            )
-                        }
-                    )
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = {
+                                Text(stringResource(R.string.btn_sign_out))
+                            },
+                            onClick = {
+                                expanded = false
+                                onLogout()
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.Logout,
+                                    contentDescription = null
+                                )
+                            }
+                        )
+                    }
                 }
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = androidx.compose.ui.graphics.Color.Transparent,
-            titleContentColor = MaterialTheme.colorScheme.primary,
-            navigationIconContentColor = MaterialTheme.colorScheme.primary,
-            actionIconContentColor = MaterialTheme.colorScheme.primary
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = androidx.compose.ui.graphics.Color.Transparent,
+                titleContentColor = MaterialTheme.colorScheme.primary,
+                navigationIconContentColor = MaterialTheme.colorScheme.primary,
+                actionIconContentColor = MaterialTheme.colorScheme.primary
+            )
         )
-    )
+        NetworkStatusBanner(isConnected = isNetworkConnected)
+    }
 }

@@ -30,6 +30,7 @@ import com.it2161.s243168t.movieviewer.ui.components.LoadingScreen
 import com.it2161.s243168t.movieviewer.ui.components.MovieAppTopAppBar
 import com.it2161.s243168t.movieviewer.ui.components.MovieBottomAppBar
 import com.it2161.s243168t.movieviewer.ui.components.MovieCard
+import com.it2161.s243168t.movieviewer.ui.components.NetworkOverlayContainer
 import com.it2161.s243168t.movieviewer.ui.components.NetworkStatusBanner
 import com.it2161.s243168t.movieviewer.ui.navigation.Routes
 import com.it2161.s243168t.movieviewer.ui.theme.Dimens
@@ -110,11 +111,15 @@ fun FavoritesScreen(
         ) {
 
             // Content with remaining scaffold padding
-            Box(
+            NetworkOverlayContainer(
+                isConnected = isNetworkConnected,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(bottom = padding.calculateBottomPadding())
             ) {
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
             when {
                 uiState.isLoading -> {
                     LoadingScreen(loadingType = LoadingType.SKELETON_LIST, itemCount = 3)
@@ -152,6 +157,7 @@ fun FavoritesScreen(
                             }
                         }
                     }
+                }
                 }
             }
         }

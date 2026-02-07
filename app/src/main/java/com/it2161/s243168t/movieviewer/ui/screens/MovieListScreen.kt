@@ -33,6 +33,7 @@ import com.it2161.s243168t.movieviewer.ui.components.LoadingScreen
 import com.it2161.s243168t.movieviewer.ui.components.MovieAppTopAppBar
 import com.it2161.s243168t.movieviewer.ui.components.MovieBottomAppBar
 import com.it2161.s243168t.movieviewer.ui.components.MovieCard
+import com.it2161.s243168t.movieviewer.ui.components.NetworkOverlayContainer
 import com.it2161.s243168t.movieviewer.ui.components.SearchBarComponent
 import com.it2161.s243168t.movieviewer.ui.navigation.Routes
 import com.it2161.s243168t.movieviewer.ui.theme.Dimens
@@ -59,6 +60,7 @@ fun MovieListScreen(
                 is MovieUiEffect.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(effect.message)
                 }
+
                 is MovieUiEffect.NavigateToDetail -> {
                     navController.navigate(Routes.MovieDetail.createRoute(effect.movieId))
                 }
@@ -74,6 +76,7 @@ fun MovieListScreen(
                         popUpTo(Routes.MovieList.route) { inclusive = true }
                     }
                 }
+
                 else -> {}
             }
         }
@@ -122,94 +125,108 @@ fun MovieListScreen(
         ) {
 
             // Content with remaining scaffold padding
-            Column(
+            NetworkOverlayContainer(
+                isConnected = isNetworkConnected,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(bottom = padding.calculateBottomPadding())
             ) {
-            // Search Bar
-            SearchBarComponent(
-                searchQuery = uiState.searchQuery,
-                onSearchQueryChanged = { query ->
-                    viewModel.onEvent(MovieUiEvent.OnSearchQueryChanged(query))
-                },
-                isEnabled = isNetworkConnected,
-                onDisabledClick = {
-                    viewModel.onEvent(MovieUiEvent.OnSearchDisabledClicked)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = Dimens.PaddingScreenHorizontal, vertical = Dimens.SpacingXxs)
-            )
-
-            // Category Selection (LazyRow)
-            LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = Dimens.PaddingScreenHorizontal, vertical = Dimens.SpacingXxs),
-                horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingSm)
-            ) {
-                items(categories.size) { index ->
-                    ButtonComponent(
-                        text = categories[index],
-                        onClick = {
-                            viewModel.onEvent(
-                                MovieUiEvent.OnCategoryChanged(categoryRoutes[index])
-                            )
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    // Search Bar
+                    SearchBarComponent(
+                        searchQuery = uiState.searchQuery,
+                        onSearchQueryChanged = { query ->
+                            viewModel.onEvent(MovieUiEvent.OnSearchQueryChanged(query))
                         },
-                        type = ButtonType.SELECTABLE_BUTTON,
-                        isSelected = uiState.selectedCategory == categoryRoutes[index],
-                        modifier = Modifier.padding(vertical = Dimens.SpacingXxs)
-                    )
-                }
-            }
-
-            // Movie Feed
-            when {
-                uiState.isLoading -> {
-                    LoadingScreen(
-                        loadingType = LoadingType.SKELETON_LIST,
-                        itemCount = 3
-                    )
-                }
-                uiState.movies.isEmpty() && !uiState.isOnline -> {
-                    ErrorScreen(
-                        errorType = ErrorType.NO_INTERNET,
-                        onRetry = { viewModel.onEvent(MovieUiEvent.RefreshList) }
-                    )
-                }
-                uiState.movies.isEmpty() -> {
-                    ErrorScreen(
-                        errorType = ErrorType.NO_DATA,
-                        onRetry = { viewModel.onEvent(MovieUiEvent.RefreshList) }
-                    )
-                }
-                else -> {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
+                        isEnabled = isNetworkConnected,
+                        onDisabledClick = {
+                            viewModel.onEvent(MovieUiEvent.OnSearchDisabledClicked)
+                        },
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = Dimens.PaddingScreenHorizontal),
-                        verticalArrangement = Arrangement.spacedBy(Dimens.SpacingLg),
-                        horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingLg),
-                        contentPadding = PaddingValues(vertical = Dimens.PaddingScreenVertical)
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = Dimens.PaddingScreenHorizontal,
+                                vertical = Dimens.SpacingXxs
+                            )
+                    )
+
+                    // Category Selection (LazyRow)
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = Dimens.PaddingScreenHorizontal,
+                                vertical = Dimens.SpacingXxs
+                            ),
+                        horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingSm)
                     ) {
-                        itemsIndexed(
-                            items = uiState.movies,
-                            key = { _, movie -> movie.id }
-                        ) { index, movie ->
-                            AnimatedListItem(index = index, columns = 2) {
-                                MovieCard(
-                                    movie = movie,
-                                    onClick = {
-                                        viewModel.onEvent(MovieUiEvent.OnMovieClicked(movie.id))
+                        items(categories.size) { index ->
+                            ButtonComponent(
+                                text = categories[index],
+                                onClick = {
+                                    viewModel.onEvent(
+                                        MovieUiEvent.OnCategoryChanged(categoryRoutes[index])
+                                    )
+                                },
+                                type = ButtonType.SELECTABLE_BUTTON,
+                                isSelected = uiState.selectedCategory == categoryRoutes[index],
+                                modifier = Modifier.padding(vertical = Dimens.SpacingXxs)
+                            )
+                        }
+                    }
+
+                    // Movie Feed
+                    when {
+                        uiState.isLoading -> {
+                            LoadingScreen(
+                                loadingType = LoadingType.SKELETON_LIST,
+                                itemCount = 3
+                            )
+                        }
+
+                        uiState.movies.isEmpty() && !uiState.isOnline -> {
+                            ErrorScreen(
+                                errorType = ErrorType.NO_INTERNET,
+                                onRetry = { viewModel.onEvent(MovieUiEvent.RefreshList) }
+                            )
+                        }
+
+                        uiState.movies.isEmpty() -> {
+                            ErrorScreen(
+                                errorType = ErrorType.NO_DATA,
+                                onRetry = { viewModel.onEvent(MovieUiEvent.RefreshList) }
+                            )
+                        }
+
+                        else -> {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(2),
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = Dimens.PaddingScreenHorizontal),
+                                verticalArrangement = Arrangement.spacedBy(Dimens.SpacingLg),
+                                horizontalArrangement = Arrangement.spacedBy(Dimens.SpacingLg),
+                                contentPadding = PaddingValues(vertical = Dimens.PaddingScreenVertical)
+                            ) {
+                                itemsIndexed(
+                                    items = uiState.movies,
+                                    key = { _, movie -> movie.id }
+                                ) { index, movie ->
+                                    AnimatedListItem(index = index, columns = 2) {
+                                        MovieCard(
+                                            movie = movie,
+                                            onClick = {
+                                                viewModel.onEvent(MovieUiEvent.OnMovieClicked(movie.id))
+                                            }
+                                        )
                                     }
-                                )
+                                }
                             }
                         }
                     }
                 }
-            }
             }
         }
     }

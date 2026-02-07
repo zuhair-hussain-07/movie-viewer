@@ -107,17 +107,19 @@ fun ProfileScreen(
             }
         },
         bottomBar = {
-            MovieBottomAppBar(
-                currentRoute = currentRoute,
-                onNavigate = { route ->
-                    // Handle bottom navigation
-                    when (route) {
-                        Routes.MovieList.route -> navController.navigate(Routes.MovieList.route)
-                        Routes.Favorites.route -> navController.navigate(Routes.Favorites.route)
-                        Routes.Profile.route -> {}
+            if (!uiState.isEditMode) {
+                MovieBottomAppBar(
+                    currentRoute = currentRoute,
+                    onNavigate = { route ->
+                        // Handle bottom navigation
+                        when (route) {
+                            Routes.MovieList.route -> navController.navigate(Routes.MovieList.route)
+                            Routes.Favorites.route -> navController.navigate(Routes.Favorites.route)
+                            Routes.Profile.route -> {}
+                        }
                     }
-                }
-            )
+                )
+            }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) {

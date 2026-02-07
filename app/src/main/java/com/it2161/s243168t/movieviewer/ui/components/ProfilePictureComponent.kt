@@ -19,7 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.painterResource
 import coil.compose.rememberAsyncImagePainter
+import com.it2161.s243168t.movieviewer.R
 
 @Composable
 fun ProfilePictureComponent(
@@ -47,11 +49,11 @@ fun ProfilePictureComponent(
                     contentScale = ContentScale.Crop
                 )
             } else {
-                Icon(
-                    imageVector = Icons.Default.PhotoCamera,
+                Image(
+                    painter = painterResource(R.drawable.pfp_placeholder),
                     contentDescription = "No Profile Picture",
-                    modifier = Modifier.size(64.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    modifier = Modifier.fillMaxSize().clip(CircleShape),
+                    contentScale = ContentScale.Crop
                 )
             }
         }

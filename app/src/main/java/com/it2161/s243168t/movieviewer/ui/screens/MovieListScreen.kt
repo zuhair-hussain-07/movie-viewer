@@ -133,6 +133,10 @@ fun MovieListScreen(
                 onSearchQueryChanged = { query ->
                     viewModel.onEvent(MovieUiEvent.OnSearchQueryChanged(query))
                 },
+                isEnabled = isNetworkConnected,
+                onDisabledClick = {
+                    viewModel.onEvent(MovieUiEvent.OnSearchDisabledClicked)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = Dimens.PaddingScreenHorizontal, vertical = Dimens.SpacingXxs)

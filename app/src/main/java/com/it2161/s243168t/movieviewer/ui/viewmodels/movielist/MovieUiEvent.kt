@@ -8,4 +8,5 @@ sealed class MovieUiEvent {
     data class OnMovieClicked(val movieId: Int) : MovieUiEvent()
     data class ToggleFavorite(val movie: Movie) : MovieUiEvent()
     object RefreshList : MovieUiEvent()
+    object OnSearchDisabledClicked : MovieUiEvent()
 }

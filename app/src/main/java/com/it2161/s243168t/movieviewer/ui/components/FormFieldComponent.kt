@@ -31,7 +31,9 @@ fun FormFieldComponent(
     isPasswordVisible: Boolean = false,
     onPasswordVisibilityToggle: () -> Unit = {},
     onTrailingIconClick: () -> Unit = {},
-    errorMessage: String? = null
+    errorMessage: String? = null,
+    enabled: Boolean = true,
+    onDisabledClick: () -> Unit = {}
 ) {
     val isError = errorMessage != null
     val isClickableField = type == FormFieldType.DATE || type == FormFieldType.PHOTO
@@ -45,6 +47,7 @@ fun FormFieldComponent(
                 .fillMaxWidth()
                 .padding(vertical = 4.dp),
             shape = RoundedCornerShape(8.dp),
+            enabled = enabled,
             visualTransformation = if (type == FormFieldType.PASSWORD && !isPasswordVisible) {
                 PasswordVisualTransformation()
             } else {
@@ -85,6 +88,15 @@ fun FormFieldComponent(
                 modifier = Modifier
                     .matchParentSize()
                     .clickable { onTrailingIconClick() }
+            )
+        }
+
+        // Make disabled text fields clickable to show disabled message
+        if (!enabled && type == FormFieldType.TEXT) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .clickable { onDisabledClick() }
             )
         }
     }

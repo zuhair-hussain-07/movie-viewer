@@ -83,6 +83,7 @@ class MovieViewModel @Inject constructor(
             is MovieUiEvent.OnMovieClicked -> handleMovieClicked(event.movieId)
             is MovieUiEvent.ToggleFavorite -> handleToggleFavorite(event.movie)
             MovieUiEvent.RefreshList -> handleRefresh()
+            MovieUiEvent.OnSearchDisabledClicked -> handleSearchDisabledClicked()
         }
     }
 
@@ -109,13 +110,29 @@ class MovieViewModel @Inject constructor(
     }
 
     private fun handleSearchQueryChange(query: String) {
-        _uiState.update { it.copy(searchQuery = query) }
+        viewModelScope.launch {
+            // Check if offline and user is trying to search
+            if (!_uiState.value.isOnline && query.isNotBlank()) {
+                emitEffect(MovieUiEffect.ShowSnackbar("Search is not available offline"))
+                // Clear the search query to prevent the field from being populated
+                _uiState.update { it.copy(searchQuery = "") }
+                return@launch
+            }
 
-        // If query is empty, reload the current category
-        if (query.isBlank()) {
-            loadMovies(_uiState.value.selectedCategory)
+            _uiState.update { it.copy(searchQuery = query) }
+
+            // If query is empty, reload the current category
+            if (query.isBlank()) {
+                loadMovies(_uiState.value.selectedCategory)
+            }
+            // Otherwise, the debounce will trigger the search
         }
-        // Otherwise, the debounce will trigger the search
+    }
+
+    private fun handleSearchDisabledClicked() {
+        viewModelScope.launch {
+            emitEffect(MovieUiEffect.ShowSnackbar("Search is not available offline"))
+        }
     }
 
     private fun handleMovieClicked(movieId: Int) {

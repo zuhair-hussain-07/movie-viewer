@@ -92,6 +92,9 @@
     <string name="cd_author_avatar">Author avatar</string>
     <string name="cd_movie_poster">%s poster</string>
 
+    <!-- Offline Messages -->
+    <string name="search_not_available_offline">Search is not available offline</string>
+
     <!-- Formats -->
     <string name="format_rating">⭐ %s</string>
     <string name="format_rating_out_of_ten">%s/10</string>

@@ -8,14 +8,18 @@ import com.it2161.s243168t.movieviewer.data.local.enums.FormFieldType
 fun SearchBarComponent(
     searchQuery: String,
     onSearchQueryChanged: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isEnabled: Boolean = true,
+    onDisabledClick: () -> Unit = {}
 ) {
     FormFieldComponent(
         value = searchQuery,
         onValueChange = onSearchQueryChanged,
         label = "Search movies...",
         type = FormFieldType.TEXT,
-        modifier = modifier
+        modifier = modifier,
+        enabled = isEnabled,
+        onDisabledClick = onDisabledClick
     )
 }
 
